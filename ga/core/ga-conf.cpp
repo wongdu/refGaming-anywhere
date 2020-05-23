@@ -216,6 +216,7 @@ ga_conf_load(const char *filename) {
 	//
 	if(filename == NULL)
 		return -1;
+		
 	if((fp = fopen(filename, "rt")) == NULL) {
 		return -1;
 	}
@@ -226,6 +227,23 @@ ga_conf_load(const char *filename) {
 			return -1;
 		}
 	}
+
+	//char pBuf[MAX_PATH];
+	//GetCurrentDirectory(MAX_PATH, pBuf);
+	////..\vs2013\Release\config\server.openttd.conf
+	//std::string strFullPath = pBuf;
+	//strFullPath = strFullPath + "\\"+filename;
+	//if ((fp = fopen(strFullPath.c_str(), "rt")) == NULL) {
+	//	return -1;
+	//}
+	//while (fgets(buf, sizeof(buf), fp) != NULL) {
+	//	lineno++;
+	//	if (ga_conf_parse(strFullPath.c_str(), lineno, buf) < 0) {
+	//		fclose(fp);
+	//		return -1;
+	//	}
+	//}
+
 	fclose(fp);
 	return lineno;
 }

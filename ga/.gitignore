@@ -15,7 +15,9 @@
 *.so
 *.dylib
 # *.dll
-vs2013/Release/*.dll
+# vs2013/Release/*.dll
+vs2013/Release/libga.dll
+
 
 # Fortran module files
 *.mod
