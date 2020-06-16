@@ -24,3 +24,14 @@
 /ga/client/ga-client
 /ga/server/periodic/ga-server-periodic
 ga/vs2013/ga-server-periodic/send.raw
+ga/vs2013/Release/mod/vsource-desktop.dll
+ga/vs2013/Release/mod/vsource-desktop-dfm.dll
+ga/vs2013/Release/mod/vsource-desktop-d3d.dll
+ga/vs2013/Release/mod/server-live555.dll
+ga/vs2013/Release/mod/server-ffmpeg.dll
+ga/vs2013/Release/mod/filter-rgb2yuv.dll
+ga/vs2013/Release/mod/encoder-x264.dll
+ga/vs2013/Release/mod/encoder-video.dll
+ga/vs2013/Release/mod/encoder-audio.dll
+ga/vs2013/Release/mod/asource-system.dll
+ga/vs2013/Release/ga-hook.dll
