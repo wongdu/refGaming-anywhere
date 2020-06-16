@@ -767,7 +767,7 @@ void* thread_func1(void* arg)
 	return NULL;
 }
 
-int main(int argc, char *argv[]){	
+int main3(int argc, char *argv[]){	
 	sem_init(&m_SemReady, 0, 0);
 
 	printf("main thread:%lu is running\n", pthread_self());
@@ -884,7 +884,7 @@ int maintt(int argc, char *argv[]){
 	return 0;
 }
 
-int mainttt(int argc, char *argv[]) 
+int main(int argc, char *argv[]) 
 //int main()
 {
 	int i;
