@@ -71,12 +71,12 @@
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;NO_OPENSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\deps.win32\lib;$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libga.lib;ws2_32.lib;libliveMedia.d.lib;libgroupsock.d.lib;libBasicUsageEnvironment.d.lib;libUsageEnvironment.d.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libga.lib;ws2_32.lib;libliveMedia_d.lib;libgroupsock_d.lib;libBasicUsageEnvironment_d.lib;libUsageEnvironment_d.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
