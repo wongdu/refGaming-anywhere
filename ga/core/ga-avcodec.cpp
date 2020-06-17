@@ -177,6 +177,8 @@ ga_avcodec_vencoder_init(AVCodecContext *ctx, AVCodec *codec, int width, int hei
 	ctx->pix_fmt = AV_PIX_FMT_YUV420P;
 	ctx->width = width;
 	ctx->height = height;
+	//ctx->gop_size = fps * 2;
+	//ctx->gop_size = 10;
 
 #if 0
         av_dict_set(&opts, "profile", "baseline", 0);
