@@ -59,12 +59,13 @@ static char *_vps[VIDEO_SOURCE_CHANNEL_MAX];
 static int _vpslen[VIDEO_SOURCE_CHANNEL_MAX];
 
 #define SAVE_ENC        "send.raw"
+
 #ifdef SAVE_ENC
 static FILE *fout = NULL;
 #endif
+static bool bHeaderWritten = false;
 
-static int
-vencoder_deinit(void *arg) {
+static int vencoder_deinit(void *arg) {
 	int iid;
 	for(iid = 0; iid < video_source_channels(); iid++) {
 		if(_sps[iid] != NULL)
@@ -284,6 +285,7 @@ vencoder_threadproc(void *arg) {
 		outputW, outputH, rtspconf->video_fps,
 		nalbuf_size, pic_in_size);
 	//
+	int tempCount = 0;
 	while(vencoder_started != 0 && encoder_running() > 0) {
 		// Reconfigure encoder (if required)
 		vencoder_reconfigure(iid);
@@ -335,14 +337,28 @@ vencoder_threadproc(void *arg) {
 		av_init_packet(&pkt);
 		pkt.data = nalbuf_a;
 		pkt.size = nalbuf_size;
+		if (tempCount++%48==0){
+			tempCount = 1;
+			pic_in->pict_type = AV_PICTURE_TYPE_I;
+		}
+		
 		if(avcodec_encode_video2(encoder, &pkt, pic_in, &got_packet) < 0) {
 			ga_error("video encoder: encode failed, terminated.\n");
 			goto video_quit;
 		}
+		//恢复强制编码I帧
+		pic_in->pict_type = AV_PICTURE_TYPE_NONE;
+
 		if(got_packet) {
 			if(pkt.pts == (int64_t) AV_NOPTS_VALUE) {
 				pkt.pts = pts;
 			}
+
+			if (pkt.flags & AV_PKT_FLAG_KEY){
+				//这个标志跟Elecard StreamEye Tools的I帧判断结果并不匹配
+				ga_log("-------------------------->got key_frame while the pic__size is:=%d\n", (&pkt)->size);
+			}
+
 			pkt.stream_index = 0;
 #if 0			// XXX: dump naltype
 			do {
@@ -415,6 +431,7 @@ vencoder_start(void *arg) {
 #ifdef SAVE_ENC
 	if (fout == NULL) {
 		fout = fopen(SAVE_ENC, "wb");
+		bHeaderWritten = false;
 	}
 #endif
 	ga_log("call vencoder_start\n");
@@ -489,13 +506,19 @@ h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
 	unsigned char *r;
 	unsigned char *sps = NULL, *pps = NULL, *vps = NULL;
 	int spslen = 0, ppslen = 0, vpslen = 0;
-	char temp[36] = {0};
-	memcpy(temp,data,datalen);
+	/*char temp[36] = {0};
+	memcpy(temp,data,datalen);*/
 	ga_log("call h264or5_get_vparam channelId:%d,datalen:%d\n", channelId, datalen);
 	for (int idx = 0; idx < datalen;idx++){
 		ga_log("%X ", data[idx]);
 	}
 	ga_log("\n");
+	if (!bHeaderWritten){
+		bHeaderWritten = true;
+		fwrite(data, sizeof(char), datalen, fout);
+		fflush(fout);
+		ga_log("in h264or5_get_vparam function write the header\n");
+	}
 	//ga_log("call h264or5_get_vparam temp:%x\n", temp);
 	if(_sps[channelId] != NULL)
 		return 0;
