@@ -58,12 +58,13 @@ static int _ppslen[VIDEO_SOURCE_CHANNEL_MAX];
 static char *_vps[VIDEO_SOURCE_CHANNEL_MAX];
 static int _vpslen[VIDEO_SOURCE_CHANNEL_MAX];
 
-#define SAVE_ENC        "send.raw"
+//#define SAVE_ENC        "send.raw"
 
 #ifdef SAVE_ENC
 static FILE *fout = NULL;
-#endif
 static bool bHeaderWritten = false;
+#endif
+
 
 static int vencoder_deinit(void *arg) {
 	int iid;
@@ -337,27 +338,27 @@ vencoder_threadproc(void *arg) {
 		av_init_packet(&pkt);
 		pkt.data = nalbuf_a;
 		pkt.size = nalbuf_size;
-		if (tempCount++%48==0){
+		/*if (tempCount++%48==0){
 			tempCount = 1;
 			pic_in->pict_type = AV_PICTURE_TYPE_I;
-		}
+		}*/
 		
 		if(avcodec_encode_video2(encoder, &pkt, pic_in, &got_packet) < 0) {
 			ga_error("video encoder: encode failed, terminated.\n");
 			goto video_quit;
 		}
 		//恢复强制编码I帧
-		pic_in->pict_type = AV_PICTURE_TYPE_NONE;
+		//pic_in->pict_type = AV_PICTURE_TYPE_NONE;
 
 		if(got_packet) {
 			if(pkt.pts == (int64_t) AV_NOPTS_VALUE) {
 				pkt.pts = pts;
 			}
 
-			if (pkt.flags & AV_PKT_FLAG_KEY){
+			/*if (pkt.flags & AV_PKT_FLAG_KEY){
 				//这个标志跟Elecard StreamEye Tools的I帧判断结果并不匹配
 				ga_log("-------------------------->got key_frame while the pic__size is:=%d\n", (&pkt)->size);
-			}
+			}*/
 
 			pkt.stream_index = 0;
 #if 0			// XXX: dump naltype
@@ -513,12 +514,14 @@ h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
 		ga_log("%X ", data[idx]);
 	}
 	ga_log("\n");
+#ifdef SAVE_ENC
 	if (!bHeaderWritten){
 		bHeaderWritten = true;
 		fwrite(data, sizeof(char), datalen, fout);
 		fflush(fout);
 		ga_log("in h264or5_get_vparam function write the header\n");
 	}
+#endif
 	//ga_log("call h264or5_get_vparam temp:%x\n", temp);
 	if(_sps[channelId] != NULL)
 		return 0;
