@@ -227,5 +227,11 @@ void  GAMediaSubsession::RTCPAppHandlerFunc_(void* clientData,
 			appDependentData, appDependentDataSize);
 	ga_module_t *m = encoder_get_vencoder();
 	ga_module_ioctl(m, GA_IOCTL_CUSTOM, 0, NULL);
+
+	std::string strTemp = "ok";
+	GAMediaSubsession *pObj = static_cast<GAMediaSubsession *>(clientData);
+	if (pObj){
+		pObj->sendRTCPAppPacket(0, "feedback", (unsigned char*)strTemp.c_str(), sizeof "ok");
+	}	
 }
 
