@@ -44,6 +44,10 @@ protected:
 	virtual RTPSink* createNewRTPSink(Groupsock* rtpGroupsock,
 			unsigned char rtpPayloadTypeIfDynamic,
 			FramedSource* inputSource);
+private:
+	static void RTCPAppHandlerFunc_(void* clientData,
+		u_int8_t subtype, u_int32_t nameBytes/*big-endian order*/,
+		u_int8_t* appDependentData, unsigned appDependentDataSize);
 };
 
 #endif /* __GA_MEDIASUBSESSION_H__ */

@@ -37,6 +37,7 @@ GAMediaSubsession
 		: OnDemandServerMediaSubsession(env, True/*reuseFirstSource*/, initialPortNum, multiplexRTCPWithRTP) {
 	this->mimetype = strdup(mimetype);
 	this->channelId = cid;
+	OnDemandServerMediaSubsession::setRTCPAppPacketHandler(&GAMediaSubsession::RTCPAppHandlerFunc_,this);
 }
 
 GAMediaSubsession * GAMediaSubsession
@@ -213,5 +214,18 @@ RTPSink* GAMediaSubsession
 		ga_error("GAMediaSubsession: create RTP sink for %s failed.\n", mimetype);
 	}
 	return result;
+}
+
+void  GAMediaSubsession::RTCPAppHandlerFunc_(void* clientData,
+	u_int8_t subtype, u_int32_t nameBytes/*big-endian order*/,
+	u_int8_t* appDependentData, unsigned appDependentDataSize){
+	//ga_error("GAMediaSubsession::RTCPAppHandlerFunc_ is called\n");
+	ga_log("GAMediaSubsession::RTCPAppHandlerFunc_ \
+		    subtype:%d,nameBytes:%d,\
+		   	appDependentData:%s,appDependentDataSize:%d\n", 
+			subtype, nameBytes,
+			appDependentData, appDependentDataSize);
+	ga_module_t *m = encoder_get_vencoder();
+	ga_module_ioctl(m, GA_IOCTL_CUSTOM, 0, NULL);
 }
 

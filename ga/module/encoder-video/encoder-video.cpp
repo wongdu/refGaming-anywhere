@@ -58,6 +58,7 @@ static int _ppslen[VIDEO_SOURCE_CHANNEL_MAX];
 static char *_vps[VIDEO_SOURCE_CHANNEL_MAX];
 static int _vpslen[VIDEO_SOURCE_CHANNEL_MAX];
 
+static bool bRequestKeyframe = false;
 //#define SAVE_ENC        "send.raw"
 
 #ifdef SAVE_ENC
@@ -342,6 +343,10 @@ vencoder_threadproc(void *arg) {
 			tempCount = 1;
 			pic_in->pict_type = AV_PICTURE_TYPE_I;
 		}*/
+		if (bRequestKeyframe && pic_in){
+			pic_in->pict_type = AV_PICTURE_TYPE_I;
+			ga_log("int vencoder_threadproc request I frame\n");
+		}
 		
 		if(avcodec_encode_video2(encoder, &pkt, pic_in, &got_packet) < 0) {
 			ga_error("video encoder: encode failed, terminated.\n");
@@ -349,7 +354,11 @@ vencoder_threadproc(void *arg) {
 		}
 		//»Ö¸´Ç¿ÖÆ±àÂëIÖ¡
 		//pic_in->pict_type = AV_PICTURE_TYPE_NONE;
-
+		if (bRequestKeyframe && pic_in){
+			pic_in->pict_type = AV_PICTURE_TYPE_NONE;
+			bRequestKeyframe = false;
+		}
+		
 		if(got_packet) {
 			if(pkt.pts == (int64_t) AV_NOPTS_VALUE) {
 				pkt.pts = pts;
@@ -667,6 +676,9 @@ vencoder_ioctl(int command, int argsize, void *arg) {
 			buf->size = _vpslen[buf->id];
 			bcopy(_vps[buf->id], buf->ptr, buf->size);
 		}
+		break;
+	case  GA_IOCTL_CUSTOM:
+		bRequestKeyframe = true;
 		break;
 	default:
 		ret = GA_IOCTL_ERR_NOTSUPPORTED;
