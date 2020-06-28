@@ -352,7 +352,7 @@ vencoder_threadproc(void *arg) {
 			ga_error("video encoder: encode failed, terminated.\n");
 			goto video_quit;
 		}
-		//»Ö¸´Ç¿ÖÆ±àÂëIÖ¡
+		//æ¢å¤å¼ºåˆ¶ç¼–ç Iå¸§
 		//pic_in->pict_type = AV_PICTURE_TYPE_NONE;
 		if (bRequestKeyframe && pic_in){
 			pic_in->pict_type = AV_PICTURE_TYPE_NONE;
@@ -365,7 +365,7 @@ vencoder_threadproc(void *arg) {
 			}
 
 			/*if (pkt.flags & AV_PKT_FLAG_KEY){
-				//Õâ¸ö±êÖ¾¸úElecard StreamEye ToolsµÄIÖ¡ÅÐ¶Ï½á¹û²¢²»Æ¥Åä
+				//è¿™ä¸ªæ ‡å¿—è·ŸElecard StreamEye Toolsçš„Iå¸§åˆ¤æ–­ç»“æžœå¹¶ä¸åŒ¹é…
 				ga_log("-------------------------->got key_frame while the pic__size is:=%d\n", (&pkt)->size);
 			}*/
 
