@@ -184,17 +184,16 @@ ga_log(const char *fmt, ...) {
 #ifdef __APPLE__
 	syslog(LOG_NOTICE, "%s", msg);
 #endif
-
-	char msg_[4096];
+		
 #ifdef WIN32
+	char msg_[4096] = {0};
 	//sprintf_s(msg_, "ga_log.GA: %s", msg);
 	sprintf_s(msg_, "%s", msg);
 	//OutputDebugString(CA2W(msg_));
 	OutputDebugString(msg_);
 #endif
-	//
+
 	ga_writelog(tv, msg);
-	//
 	return 0;
 }
 
@@ -224,9 +223,16 @@ ga_error(const char *fmt, ...) {
 	syslog(LOG_NOTICE, "%s", msg);
 #endif
 	fprintf(stderr, "# [%d] %ld.%06ld %s", getpid(), tv.tv_sec, tv.tv_usec, msg);
-	//
-	ga_writelog(tv, msg);
-	//
+	
+#ifdef WIN32
+	char msg_[4096] = { 0 };
+	//sprintf_s(msg_, "ga_log.GA: %s", msg);
+	sprintf_s(msg_, "%s", msg);
+	//OutputDebugString(CA2W(msg_));
+	OutputDebugString(msg_);
+#endif
+
+	ga_writelog(tv, msg);	
 	return -1;
 }
 

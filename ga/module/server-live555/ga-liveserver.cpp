@@ -10,6 +10,7 @@
 #include "ga-liveserver.h"
 
 static UsageEnvironment* env = NULL;
+static OnDemandServerMediaSubsession* pSubsession;
 
 void *
 liveserver_taskscheduler() {
@@ -60,7 +61,8 @@ liveserver_main(void *arg) {
 		exit(-1);
 	}
 	for(cid = 0; cid < video_source_channels(); cid++) {
-		sms->addSubsession(GAMediaSubsession::createNew(*env, cid, m->mimetype)); 
+		pSubsession = GAMediaSubsession::createNew(*env, cid, m->mimetype);
+		sms->addSubsession(pSubsession);
 	}
 	// add audio session, if necessary
 	if((m = encoder_get_aencoder()) != NULL) {
@@ -97,6 +99,8 @@ static std::map<RTPSink*, std::map<unsigned/*SSRC*/,qos_server_record_t> > sinkm
 static TaskToken qos_task = NULL;
 static int qos_started = 0;
 static struct timeval qos_tv;
+static const unsigned short Max_Rtd_Length = 128;
+static char arrFeedbackRtd[Max_Rtd_Length] = { 0 };
 
 static void qos_server_schedule();
 
@@ -126,6 +130,25 @@ qos_server_report(void *clientData) {
 				qr.timestamp = now;
 				mi->second[ssrc] = qr;
 				continue;
+			}
+
+			//if (pSubsession){
+			if ((strcmp("H264", mi->first->rtpPayloadFormatName()) == 0 ||
+				 strcmp("H265", mi->first->rtpPayloadFormatName()) == 0) && 
+				 pSubsession){
+				//std::string strTemp = std::to_string(1000.0 * stats->roundTripDelay() / 65536);		
+				//std::string strTemp = "12345678";
+				//pSubsession->sendRTCPAppPacket(111, "roundTripDelay", (unsigned char*)strTemp.c_str(), sizeof(strTemp.c_str()));
+				//pSubsession->sendRTCPAppPacket(117, "roundTripDelay", (unsigned char*)strTemp.c_str(), strTemp.length());
+				/*pSubsession->sendRTCPAppPacket(117, "ab", (unsigned char*)strTemp.c_str(), strTemp.length());
+				ga_error("ssrc (%lu),roundTripDelay (%s) (%d)  (%x)\n", ssrc, strTemp.c_str(), strTemp.length(),stats);*/
+				//memset(arrFeedbackRtd, '\0', Max_Rtd_Length);
+				memset(arrFeedbackRtd, 0, Max_Rtd_Length);
+				//sprintf_s(arrFeedbackRtd, "%u_%s", ssrc, std::to_string(1000.0 * stats->roundTripDelay() / 65536).c_str());
+				//sprintf(arrFeedbackRtd, "%u_%s", ssrc, std::to_string(1000.0 * stats->roundTripDelay() / 65536).c_str());
+				sprintf(arrFeedbackRtd, "%u_%f", ssrc, 1000.0 * stats->roundTripDelay() / 65536);
+				pSubsession->sendRTCPAppPacket(10, "ab", (unsigned char*)arrFeedbackRtd, strlen(arrFeedbackRtd));
+				ga_error("ssrc (%lu),roundTripDelay (%s) (%d)  (%x)\n", ssrc, (unsigned char*)arrFeedbackRtd, strlen(arrFeedbackRtd), stats);
 			}
 			//
 			elapsed = tvdiff_us(&now, &mj->second.timestamp);

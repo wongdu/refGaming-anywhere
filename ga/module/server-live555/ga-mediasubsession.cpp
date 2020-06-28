@@ -228,6 +228,7 @@ void  GAMediaSubsession::RTCPAppHandlerFunc_(void* clientData,
 	ga_module_t *m = encoder_get_vencoder();
 	ga_module_ioctl(m, GA_IOCTL_CUSTOM, 0, NULL);
 
+	//回复rtcp响应消息
 	std::string strTemp = "ok";
 	GAMediaSubsession *pObj = static_cast<GAMediaSubsession *>(clientData);
 	if (pObj){
