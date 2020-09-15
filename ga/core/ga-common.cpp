@@ -47,6 +47,10 @@
 #include "atlstr.h"
 #include <time.h>
 #include <Windows.h>
+#include <tlhelp32.h>
+#include <psapi.h>
+
+#pragma comment(lib, "Psapi.lib")
 #endif
 
 #if !defined(WIN32) && !defined(__APPLE__) && !defined(ANDROID)
@@ -834,8 +838,63 @@ ga_crop_window(struct gaRect *rect, struct gaRect **prect) {
 		rect->left--;
 	if((rect->bottom - rect->top + 1) % 2 != 0)
 		rect->top--;
-	//
-	if(rect->left < 0 || rect->top < 0 || rect->right >= dw || rect->bottom >= dh) {
+	
+	if (rect->left < 0)
+	{
+		rect->right = rect->right - rect->left;
+		rect->left = 0;
+	}
+	if (rect->top < 0)
+	{
+		rect->bottom = rect->bottom - rect->top;
+		rect->top = 0;
+	}
+
+	DWORD dwProcId = 0;
+	GetWindowThreadProcessId(hWnd, &dwProcId);
+
+	char filePath[MAX_PATH] = { 0 };
+	PROCESSENTRY32 my;
+	HANDLE l = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (((int)l) != -1)
+	{
+		my.dwSize = sizeof(my);
+		if (Process32First(l, &my))
+		{
+			do
+			{
+				CharLowerBuff(my.szExeFile, MAX_PATH);
+				if (dwProcId == my.th32ProcessID){
+
+					HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, my.th32ProcessID);
+					if (hProcess != NULL)
+					{
+						if (GetModuleFileNameEx(hProcess, NULL, filePath, MAX_PATH))
+						{
+							fprintf(stderr, "the full path is: %s\n", filePath);
+						}
+						else
+						{
+							fprintf(stderr, "GetModuleFileNameExW failed with error: %d\n", GetLastError());
+						}
+						CloseHandle(hProcess);
+					}
+
+					ga_log("the path is %s\n", my.szExeFile);
+					break;
+				}
+			} while (Process32Next(l, &my));
+		}
+		CloseHandle(l);
+	}
+
+	CharLowerBuff(filePath, MAX_PATH);
+	if (strstr(filePath, "bluestacks")){
+		//rect->top = lt.y + 40;
+		rect->top = rect->top + 40;
+	}
+
+	if (rect->left < 0 || rect->top < 0 || rect->right >= dw || rect->bottom >= dh || rect->top >= rect->bottom) {
 		ga_error("Invalid window: (%d,%d)-(%d,%d) w=%d h=%d (screen dimension = %dx%d).\n",
 			rect->left, rect->top, rect->right, rect->bottom,
 			rect->right - rect->left + 1,
