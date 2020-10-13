@@ -38,3 +38,5 @@ ga/vs2013/Release/ga-hook.dll
 ga/vs2013/ga-client/recv.raw
 Debug/*.idb
 *.idb
+ga/vs2013/Debug/*.dll
+ga/vs2013/Debug/mod/*.dll

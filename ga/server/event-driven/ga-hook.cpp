@@ -43,6 +43,8 @@
 
 #include "easyhook.h"
 
+#pragma comment(lib, "windowscodecs.lib")
+
 static HMODULE hInst = NULL;
 static int hookid = 0;
 
@@ -373,7 +375,7 @@ create_d3d9_object() {
 				&d3dpp, 
 				&pd3dDevice);
 	if(FAILED(hr)){
-		ga_error("CreateDevice failed.: %s\n", DXGetErrorString(hr));
+		//ga_error("CreateDevice failed.: %s\n", DXGetErrorString(hr));
 		return -1;
 	}
 

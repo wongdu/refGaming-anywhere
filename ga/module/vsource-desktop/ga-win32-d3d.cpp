@@ -22,7 +22,7 @@
 #include "ga-win32-d3d.h"
 
 #include <d3d9.h>
-#include <d3dx9tex.h>
+//#include <d3dx9tex.h>
 
 #define	BITSPERPIXEL	32
 

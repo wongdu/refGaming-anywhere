@@ -23,11 +23,11 @@
 #include <windows.h>
 
 #include <d3d9.h>
-#include <d3dx9.h>
+//#include <d3dx9.h>
 #include <d3d10_1.h>
 #include <d3d11.h>
-#include <d3dx9tex.h>
-#include <dxerr.h>
+//#include <d3dx9tex.h>
+//#include <dxerr.h>
 
 #define DllImport   __declspec( dllimport )
 #define DllExport   __declspec( dllexport )
