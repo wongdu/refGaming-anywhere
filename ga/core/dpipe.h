@@ -42,10 +42,10 @@ typedef struct dpipe_buffer_s {
 typedef struct dpipe_s {
 	int channel_id;		/**< channel id for the dpipe */
 	char *name;		/**< name of the dpipe */
-	//
+	
 	pthread_mutex_t cond_mutex;	/**< pthread mutex for conditional signaling */
 	pthread_cond_t cond;		/**< pthread condition */
-	//
+	
 	pthread_mutex_t io_mutex;	/**< dpipe i/o pool operation mutex */
 	dpipe_buffer_t *in;		/**< input pool: pointer to the first frame buffer in input pool (free frames) */
 	dpipe_buffer_t *out;		/**< output pool: pointer to the first frame buffer in output pool (occupied frames) */

@@ -44,7 +44,7 @@ static struct timeval synctv;
 static ga_module_t *vencoder = NULL;	/**< Video encoder instance */
 static ga_module_t *aencoder = NULL;	/**< Audio encoder instance */
 static ga_module_t *sinkserver = NULL;	/**< Sink server instance */
-static void *vencoder_param = NULL;	/**< Vieo encoder parameter */
+static void *vencoder_param = NULL;	/**< Video encoder parameter */
 static void *aencoder_param = NULL;	/**< Audio encoder parameter */
 
 /**
@@ -54,14 +54,13 @@ static void *aencoder_param = NULL;	/**< Audio encoder parameter */
  * @return The integer presentation timestamp.
  *
  * For an audio encoder, \a samplerate is the audio sample rate.
- * For a vieo encoder, \a samplerate is the video frame rate.
+ * For a video encoder, \a samplerate is the video frame rate.
  */
 int	// XXX: need to be int64_t ?
 encoder_pts_sync(int samplerate) {
 	struct timeval tv;
 	long long us;
 	int ret;
-	//
 	pthread_mutex_lock(&syncmutex);
 	if(sync_reset) {
 		gettimeofday(&synctv, NULL);
@@ -79,10 +78,9 @@ encoder_pts_sync(int samplerate) {
 /**
  * Check if the encoder has been launched.
  *
- * @return 0 if encoder is not running or 1 if encdoer is running.
+ * @return 0 if encoder is not running or 1 if encoder is running.
  */
-int
-encoder_running() {
+int encoder_running() {
 	return threadLaunched ? 1 : 0;
 }
 
@@ -93,11 +91,10 @@ encoder_running() {
  * @param param [in] Pointer to the video encoder parameter.
  * @return Currently it always returns 0.
  *
- * The encoder module is launched when a client is conneted.
- * The \a param is passed to the encoer module when the module is launched.
+ * The encoder module is launched when a client is connected.
+ * The \a param is passed to the encoder module when the module is launched.
  */
-int
-encoder_register_vencoder(ga_module_t *m, void *param) {
+int encoder_register_vencoder(ga_module_t *m, void *param) {
 	if(vencoder != NULL) {
 		ga_error("encoder: warning - replace video encoder %s with %s\n",
 			vencoder->name, m->name);
@@ -118,8 +115,7 @@ encoder_register_vencoder(ga_module_t *m, void *param) {
  * The encoder module is launched when a client is conneted.
  * The \a param is passed to the encoer module when the module is launched.
  */
-int
-encoder_register_aencoder(ga_module_t *m, void *param) {
+int encoder_register_aencoder(ga_module_t *m, void *param) {
 	if(aencoder != NULL) {
 		ga_error("encoder warning - replace audio encoder %s with %s\n",
 			aencoder->name, m->name);
@@ -141,8 +137,7 @@ encoder_register_aencoder(ga_module_t *m, void *param) {
  *
  * A sink server MUST have implemented the \a send_packet interface.
  */
-int
-encoder_register_sinkserver(ga_module_t *m) {
+int encoder_register_sinkserver(ga_module_t *m) {
 	if(m->send_packet == NULL) {
 		ga_error("encoder error: sink server %s does not define send_packet interface\n", m->name);
 		return -1;
@@ -161,8 +156,7 @@ encoder_register_sinkserver(ga_module_t *m) {
  *
  * @return Pointer to the video encoder module, or NULL if not registered.
  */
-ga_module_t *
-encoder_get_vencoder() {
+ga_module_t * encoder_get_vencoder() {
 	return vencoder;
 }
 
@@ -171,8 +165,7 @@ encoder_get_vencoder() {
  *
  * @return Pointer to the audio encoder module, or NULL if not registered.
  */
-ga_module_t *
-encoder_get_aencoder() {
+ga_module_t * encoder_get_aencoder() {
 	return aencoder;
 }
 
@@ -181,8 +174,7 @@ encoder_get_aencoder() {
  *
  * @return Pointer to the sink server module, or NULL if not registered.
  */
-ga_module_t *
-encoder_get_sinkserver() {
+ga_module_t * encoder_get_sinkserver() {
 	return sinkserver;
 }
 
@@ -206,8 +198,7 @@ encoder_get_sinkserver() {
  * For example, the \a server-ffmpeg module registered for each connected
  * game clients, but the \a server-live module only registered one.
  */
-int
-encoder_register_client(void /*RTSPContext*/ *rtsp) {
+int encoder_register_client(void /*RTSPContext*/ *rtsp) {
 	pthread_rwlock_wrlock(&encoder_lock);
 	if(encoder_clients.size() == 0) {
 		// initialize video encoder
@@ -257,8 +248,7 @@ encoder_register_client(void /*RTSPContext*/ *rtsp) {
  * @param rtsp [in] Pointer to the encoder client context.
  * @return Currently it always returns 0.
  */
-int
-encoder_unregister_client(void /*RTSPContext*/ *rtsp) {
+int encoder_unregister_client(void /*RTSPContext*/ *rtsp) {
 	pthread_rwlock_wrlock(&encoder_lock);
 	encoder_clients.erase(rtsp);
 	ga_error("encoder client unregistered: %d clients left.\n", encoder_clients.size());
@@ -301,8 +291,7 @@ encoder_unregister_client(void /*RTSPContext*/ *rtsp) {
  * from 0 to \a N-1, where \a N is the number of video tracks (usually 1).
  * A audio packet usually uses a channel id of \a N.
  */
-int
-encoder_send_packet(const char *prefix, int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
+int encoder_send_packet(const char *prefix, int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
 	if(sinkserver) {
 		return sinkserver->send_packet(prefix, channelId, pkt, encoderPts, ptv);
 	}
@@ -319,8 +308,7 @@ static list<encoder_pts_t> pts_queue[MAX_PTS_QUEUE];	// up to 8 queues
  *
  * @param queueid [in] The id of the pts queue.
  */
-int
-encoder_pts_clear(unsigned queueid) {
+int encoder_pts_clear(unsigned queueid) {
 	if(queueid >= MAX_PTS_QUEUE)
 		return -1;
 	pts_queue[queueid].clear();
@@ -335,8 +323,7 @@ encoder_pts_clear(unsigned queueid) {
  * @param ptv [in] The correspond ptv value for the \a pts.
  * @return 0 on success, or -1 on failure.
  */
-int
-encoder_pts_put(unsigned queueid, long long pts, struct timeval *ptv) {
+int encoder_pts_put(unsigned queueid, long long pts, struct timeval *ptv) {
 	encoder_pts_t p;
 	if(queueid >= MAX_PTS_QUEUE)
 		return -1;
@@ -358,8 +345,7 @@ encoder_pts_put(unsigned queueid, long long pts, struct timeval *ptv) {
  * Note that the interpolation feature may be only required for audio packets.
  * The \a interpolation value should be the sample rate of audio frames.
  */
-struct timeval *
-encoder_ptv_get(unsigned queueid, long long pts, struct timeval *ptv, int interpolation) {
+struct timeval * encoder_ptv_get(unsigned queueid, long long pts, struct timeval *ptv, int interpolation) {
 	if(ptv == NULL)
 		return NULL;
 	if(queueid >= MAX_PTS_QUEUE)
@@ -415,8 +401,7 @@ static map<qcallback_t,qcallback_t>queue_cb[VIDEO_SOURCE_CHANNEL_MAX+1];
  * If you have multiple channels, specify the number in the \a channels 
  * parameter.
  */
-int
-encoder_pktqueue_init(int channels, int qsize) {
+int encoder_pktqueue_init(int channels, int qsize) {
 	int i;
 	for(i = 0; i < channels; i++) {
 		if(pktqueue[i].buf != NULL)
@@ -444,8 +429,7 @@ encoder_pktqueue_init(int channels, int qsize) {
 /**
  * Empty packets stored in all packet queues.
  */
-int
-encoder_pktqueue_reset() {
+int encoder_pktqueue_reset() {
 	int i;
 	if(pktqueue_initchannels <= 0)
 		return -1;
@@ -460,8 +444,7 @@ encoder_pktqueue_reset() {
  *
  * @param channelId [in] Chennel id.
  */
-int
-encoder_pktqueue_reset_channel(int channelId) {
+int encoder_pktqueue_reset_channel(int channelId) {
 	pthread_mutex_lock(&pktqueue[channelId].mutex);
 	pktlist[channelId].clear();
 	pktqueue[channelId].head = pktqueue[channelId].tail = 0;
@@ -477,8 +460,7 @@ encoder_pktqueue_reset_channel(int channelId) {
  * @param channelId [in] The channel id to be read.
  * @return The occupied size in bytes.
  */
-int
-encoder_pktqueue_size(int channelId) {
+int encoder_pktqueue_size(int channelId) {
 	return pktqueue[channelId].datasize;
 }
 
@@ -494,8 +476,7 @@ encoder_pktqueue_size(int channelId) {
  * The content of \a pkt is copied into the queue buffer, so it can be released
  * after returing from the function.
  */
-int
-encoder_pktqueue_append(int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
+int encoder_pktqueue_append(int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
 	encoder_packet_queue_t *q = &pktqueue[channelId];
 	encoder_packet_t qp;
 	map<qcallback_t,qcallback_t>::iterator mi;
@@ -521,8 +502,7 @@ size_check:
 		}
 		goto size_check;
 	}
-	bcopy(pkt->data, q->buf + q->tail, pkt->size);
-	//
+	bcopy(pkt->data, q->buf + q->tail, pkt->size);	
 	qp.data = q->buf + q->tail;
 	qp.size = pkt->size;
 	qp.pts_int64 = pkt->pts;
@@ -533,20 +513,18 @@ size_check:
 	}
 	//qp.pos = q->tail;
 	qp.padding = 0;
-	//
 	q->tail += pkt->size;
 	q->datasize += pkt->size;
 	pktlist[channelId].push_back(qp);
-	//
 	if(q->tail == q->bufsize)
 		q->tail = 0;
-	//
+
 	pthread_mutex_unlock(&q->mutex);
 	// notify client
 	for(mi = queue_cb[channelId].begin(); mi != queue_cb[channelId].end(); mi++) {
 		mi->second(channelId);
 	}
-	//
+	
 	return 0;
 }
 
@@ -560,8 +538,7 @@ size_check:
  * This funcion ONLY reads the first packet.
  * It DOES NOT remove the packet from the queue.
  */
-char *
-encoder_pktqueue_front(int channelId, encoder_packet_t *pkt) {
+char * encoder_pktqueue_front(int channelId, encoder_packet_t *pkt) {
 	encoder_packet_queue_t *q = &pktqueue[channelId];
 	pthread_mutex_lock(&q->mutex);
 	if(pktlist[channelId].size() == 0) {
@@ -590,8 +567,7 @@ encoder_pktqueue_front(int channelId, encoder_packet_t *pkt) {
  * exact \a N bytes and the rest \a (M-N) bytes would be helded
  * in the second packet.
  */
-void
-encoder_pktqueue_split_packet(int channelId, char *offset) {
+void encoder_pktqueue_split_packet(int channelId, char *offset) {
 	encoder_packet_queue_t *q = &pktqueue[channelId];
 	encoder_packet_t *pkt, newpkt;
 	pthread_mutex_lock(&q->mutex);
@@ -606,12 +582,9 @@ encoder_pktqueue_split_packet(int channelId, char *offset) {
 	newpkt = *pkt;
 	newpkt.size = offset - pkt->data;
 	newpkt.padding = 0;
-	//
 	pkt->data = offset;
 	pkt->size -= newpkt.size;
-	//
 	pktlist[channelId].push_front(newpkt);
-	//
 	pthread_mutex_unlock(&q->mutex);
 	return;
 quit_split_packet:
@@ -624,8 +597,7 @@ quit_split_packet:
  *
  * @parm channelId [in] The channel id.
  */
-void
-encoder_pktqueue_pop_front(int channelId) {
+void encoder_pktqueue_pop_front(int channelId) {
 	encoder_packet_queue_t *q = &pktqueue[channelId];
 	encoder_packet_t qp;
 	pthread_mutex_lock(&q->mutex);
@@ -646,7 +618,6 @@ encoder_pktqueue_pop_front(int channelId) {
 	if(q->head == q->tail) {
 		q->head = q->tail = 0;
 	}
-	//
 	pthread_mutex_unlock(&q->mutex);
 	return;
 }
@@ -665,8 +636,7 @@ encoder_pktqueue_pop_front(int channelId) {
  * Note that a packet queue can have multiple callback functions, and
  * all of them are called on packet appending.
  */
-int
-encoder_pktqueue_register_callback(int channelId, qcallback_t cb) {
+int encoder_pktqueue_register_callback(int channelId, qcallback_t cb) {
 	queue_cb[channelId][cb] = cb;
 	ga_error("encoder: pktqueue #%d callback registered (%p)\n", channelId, cb);
 	return 0;
@@ -679,8 +649,7 @@ encoder_pktqueue_register_callback(int channelId, qcallback_t cb) {
  * @param cb [in] The callback function to be removed.
  * @return This functon always returns 0.
  */
-int
-encoder_pktqueue_unregister_callback(int channelId, qcallback_t cb) {
+int encoder_pktqueue_unregister_callback(int channelId, qcallback_t cb) {
 	queue_cb[channelId].erase(cb);
 	return 0;
 }

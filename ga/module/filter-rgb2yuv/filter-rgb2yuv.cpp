@@ -46,36 +46,31 @@ static FILE *savefp = NULL;
 /* filter_RGB2YUV_init: arg is two pointers to pipeline format string */
 /*	1st ptr: source pipeline */
 /*	2nd ptr: destination pipeline */
-/* the number of pipeline(s) is equivalut to the number of video source(s) */
+/* the number of pipeline(s) is equivalent to the number of video source(s) */
 
-static int
-filter_RGB2YUV_init(void *arg) {
+static int filter_RGB2YUV_init(void *arg) {
 	// arg is image source id
 	int iid;
 	const char **filterpipe = (const char **) arg;
 	dpipe_t *srcpipe[VIDEO_SOURCE_CHANNEL_MAX];
 	dpipe_t *dstpipe[VIDEO_SOURCE_CHANNEL_MAX];
 	char savefile[128];
-	//
 	if(filter_initialized != 0)
 		return 0;
-	//
+
 	if(ga_conf_readv("save-yuv-image", savefile, sizeof(savefile)) != NULL) {
 		savefp = ga_save_init(savefile);
 	}
 #ifdef ENABLE_EMBED_COLORCODE
 	vsource_embed_colorcode_init(0/*RGBmode*/);
 #endif
-	//
 	bzero(dstpipe, sizeof(dstpipe));
-	//
 	for(iid = 0; iid < video_source_channels(); iid++) {
 		char pixelfmt[64];
 		char srcpipename[64], dstpipename[64];
 		int inputW, inputH, outputW, outputH;
 		struct SwsContext *swsctx = NULL;
-		dpipe_buffer_t *data = NULL;
-		//
+		dpipe_buffer_t *data = NULL;		
 		snprintf(srcpipename, sizeof(srcpipename), filterpipe[0], iid);
 		snprintf(dstpipename, sizeof(dstpipename), filterpipe[1], iid);
 		srcpipe[iid] = dpipe_lookup(srcpipename);
@@ -121,9 +116,7 @@ filter_RGB2YUV_init(void *arg) {
 			ga_error("RGB2YUV filter: cannot initialize converters.\n");
 			goto init_failed;
 		}
-		//
-		dstpipe[iid] = dpipe_create(iid, dstpipename, POOLSIZE,
-				sizeof(vsource_frame_t) + video_source_mem_size(iid));
+		dstpipe[iid] = dpipe_create(iid, dstpipename, POOLSIZE,sizeof(vsource_frame_t) + video_source_mem_size(iid));
 		if(dstpipe[iid] == NULL) {
 			ga_error("RGB2YUV filter: create dst-pipeline failed (%s).\n", dstpipename);
 			goto init_failed;
@@ -136,9 +129,8 @@ filter_RGB2YUV_init(void *arg) {
 		}
 		video_source_add_pipename(iid, dstpipename);
 	}
-	//
+
 	filter_initialized = 1;
-	//
 	return 0;
 init_failed:
 	for(iid = 0; iid < video_source_channels(); iid++) {
@@ -154,8 +146,7 @@ init_failed:
 	return -1;
 }
 
-static int
-filter_RGB2YUV_deinit(void *arg) {
+static int filter_RGB2YUV_deinit(void *arg) {
 	if(savefp != NULL) {
 		ga_save_close(savefp);
 		savefp = NULL;
@@ -166,9 +157,7 @@ filter_RGB2YUV_deinit(void *arg) {
 /* filter_RGB2YUV_threadproc: arg is two pointers to pipeline name */
 /*	1st ptr: source pipeline */
 /*	2nd ptr: destination pipeline */
-
-static void *
-filter_RGB2YUV_threadproc(void *arg) {
+static void * filter_RGB2YUV_threadproc(void *arg) {
 	// arg is pointer to source pipe
 	//char pipename[64];
 	const char **filterpipe = (const char **) arg;
@@ -180,19 +169,15 @@ filter_RGB2YUV_threadproc(void *arg) {
 	vsource_frame_t *dstframe = NULL;
 	// image info
 	//int istride = video_source_maxstride();
-	//
 	unsigned char *src[] = { NULL, NULL, NULL, NULL };
 	unsigned char *dst[] = { NULL, NULL, NULL, NULL };
 	int srcstride[] = { 0, 0, 0, 0 };
 	int dststride[] = { 0, 0, 0, 0 };
 	int iid;
 	int outputW, outputH;
-	//
 	struct SwsContext *swsctx = NULL;
-	//
 	pthread_mutex_t condMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-	//
 	if(srcpipe == NULL || dstpipe == NULL) {
 		ga_error("RGB2YUV filter: bad pipeline (src=%p; dst=%p).\n", srcpipe, dstpipe);
 		goto filter_quit;
@@ -200,11 +185,9 @@ filter_RGB2YUV_threadproc(void *arg) {
 #ifdef ENABLE_EMBED_COLORCODE
 	vsource_embed_colorcode_reset();
 #endif
-	//
 	iid = dstpipe->channel_id;
 	outputW = video_source_out_width(iid);
 	outputH = video_source_out_height(iid);
-	//
 	ga_error("RGB2YUV filter[%ld]: pipe#%d from '%s' to '%s' (output-resolution=%dx%d)\n",
 		ga_gettid(), iid,
 		srcpipe->name, dstpipe->name,
@@ -221,7 +204,6 @@ filter_RGB2YUV_threadproc(void *arg) {
 			goto filter_quit;
 		}
 		srcframe = (vsource_frame_t*) srcdata->pointer;
-		//
 		dstdata = dpipe_get(dstpipe);
 		dstframe = (vsource_frame_t*) dstdata->pointer;
 		// basic info
@@ -254,7 +236,6 @@ filter_RGB2YUV_threadproc(void *arg) {
 				srcframe->realwidth, srcframe->realheight, srcframe->pixelformat,
 				dstframe->realwidth, dstframe->realheight, dstframe->pixelformat);
 		}
-		//
 		if(srcframe->pixelformat == AV_PIX_FMT_RGBA
 		|| srcframe->pixelformat == AV_PIX_FMT_BGRA/*rgba*/) {
 			src[0] = srcframe->imgbuf;
@@ -274,7 +255,6 @@ filter_RGB2YUV_threadproc(void *arg) {
 			ga_error("filter-RGB2YUV: unsupported pixel format (%d)\n", srcframe->pixelformat);
 			exit(-1);
 		}
-		//
 		dst[0] = dstframe->imgbuf;
 		dst[1] = dstframe->imgbuf + outputH*outputW;
 		dst[2] = dstframe->imgbuf + outputH*outputW + (outputH*outputW>>2);
@@ -283,7 +263,6 @@ filter_RGB2YUV_threadproc(void *arg) {
 		dstframe->linesize[1] = dststride[1] = outputW>>1;
 		dstframe->linesize[2] = dststride[2] = outputW>>1;
 		dstframe->linesize[3] = dststride[3] = 0;
-		//
 		sws_scale(swsctx,
 			src, srcstride, 0, srcframe->realheight,
 			dst, dstframe->linesize);
@@ -295,12 +274,10 @@ filter_RGB2YUV_threadproc(void *arg) {
 		if(iid == 0 && savefp != NULL) {
 			ga_save_yuv420p(savefp, outputW, outputH, dst, dstframe->linesize);
 		}
-		//
 		dpipe_put(srcpipe, srcdata);
 		dpipe_store(dstpipe, dstdata);
-		//
 	}
-	//
+
 filter_quit:
 	if(srcpipe) {
 		srcpipe = NULL;
@@ -309,27 +286,22 @@ filter_quit:
 		dpipe_destroy(dstpipe);
 		dstpipe = NULL;
 	}
-	//
-	if(swsctx)	sws_freeContext(swsctx);
-	//
+	if(swsctx)
+		sws_freeContext(swsctx);
 	ga_error("RGB2YUV filter: thread terminated.\n");
-	//
 	return NULL;
 }
 
 /* filter_RGB2YUV_start: arg is two pointers to pipeline format string */
 /*	1st ptr: source pipeline */
 /*	2nd ptr: destination pipeline */
-/* the number of pipeline(s) is equivalut to the number of video source(s) */
-
-static int
-filter_RGB2YUV_start(void *arg) {
+/* the number of pipeline(s) is equivalent to the number of video source(s) */
+static int filter_RGB2YUV_start(void *arg) {
 	int iid;
 	const char **filterpipe = (const char **) arg;
 	static char *filter_param[VIDEO_SOURCE_CHANNEL_MAX][2];
 #define	MAXPARAMLEN	64
 	static char params[VIDEO_SOURCE_CHANNEL_MAX][2][MAXPARAMLEN];
-	//
 	if(filter_started != 0)
 		return 0;
 	filter_started = 1;
@@ -350,9 +322,7 @@ filter_RGB2YUV_start(void *arg) {
 }
 
 /* filter_RGB2YUV_stop: no arguments are required */
-
-static int
-filter_RGB2YUV_stop(void *arg) {
+static int filter_RGB2YUV_stop(void *arg) {
 	int iid;
 	if(filter_started == 0)
 		return 0;
@@ -363,8 +333,7 @@ filter_RGB2YUV_stop(void *arg) {
 	return 0;
 }
 
-ga_module_t *
-module_load() {
+ga_module_t * module_load() {
 	static ga_module_t m;
 	bzero(&m, sizeof(m));
 	m.type = GA_MODULE_TYPE_FILTER;
@@ -376,4 +345,3 @@ module_load() {
 	//m.threadproc = filter_RGB2YUV_threadproc;
 	return &m;
 }
-

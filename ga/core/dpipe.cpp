@@ -41,8 +41,7 @@ static map<string,dpipe_t*> dpipemap;
  *
  * Note: dpipe_create() also returns NULL if the requesting name is existed.
  */
-dpipe_t *
-dpipe_create(int id, const char *name, int nframe, int maxframesize) {
+dpipe_t * dpipe_create(int id, const char *name, int nframe, int maxframesize) {
 	int i;
 	dpipe_t *dpipe;
 	// sanity checks
@@ -54,7 +53,7 @@ dpipe_create(int id, const char *name, int nframe, int maxframesize) {
 	// allocate the space
 	if((dpipe = (dpipe_t*) malloc(sizeof(dpipe_t))) == NULL)
 		return NULL;
-	//
+	
 	bzero(dpipe, sizeof(dpipe_t));
 	dpipe->channel_id = id;
 	if((dpipe->name = strdup(name)) == NULL)
@@ -76,7 +75,7 @@ dpipe_create(int id, const char *name, int nframe, int maxframesize) {
 		dpipe->in = dbuffer;
 		dpipe->in_count++;
 	}
-	//
+	
 	pthread_mutex_lock(&dpipemap_mutex);
 	dpipemap[dpipe->name] = dpipe;
 	pthread_mutex_unlock(&dpipemap_mutex);
@@ -95,11 +94,9 @@ err_create:
  * @param name [in] The name of the pipe
  * @return Pointer to the requested pipe, or NULL if not found.
  */
-dpipe_t *
-dpipe_lookup(const char *name) {
+dpipe_t * dpipe_lookup(const char *name) {
 	map<string,dpipe_t*>::iterator mi;
-	dpipe_t *dpipe = NULL;
-	//
+	dpipe_t *dpipe = NULL;	
 	pthread_mutex_lock(&dpipemap_mutex);
 	if((mi = dpipemap.find(name)) != dpipemap.end())
 		dpipe = mi->second;
@@ -113,8 +110,7 @@ dpipe_lookup(const char *name) {
  * @param dpipe [in] Pointer to the dpipe structure
  * @return Currently always return 0
  */
-int
-dpipe_destroy(dpipe_t *dpipe) {
+int dpipe_destroy(dpipe_t *dpipe) {
 	dpipe_buffer_t *vbuf, *next;
 	if(dpipe == NULL)
 		return 0;
@@ -127,7 +123,7 @@ dpipe_destroy(dpipe_t *dpipe) {
 	pthread_mutex_destroy(&dpipe->cond_mutex);
 	pthread_cond_destroy(&dpipe->cond);
 	pthread_mutex_destroy(&dpipe->io_mutex);
-	//
+	
 	for(vbuf = dpipe->in; vbuf != NULL; vbuf = next) {
 		next = vbuf->next;
 		free(vbuf->internal);
@@ -138,7 +134,7 @@ dpipe_destroy(dpipe_t *dpipe) {
 		free(vbuf->internal);
 		free(vbuf);
 	}
-	//
+	
 	free(dpipe);
 	return 0;
 }
@@ -152,14 +148,12 @@ dpipe_destroy(dpipe_t *dpipe) {
  * Note: Data should be stored in vbuf->pointer, with a maximum size
  * of \a maxframesize given when creating the pipe.
  * This function should always success.
- * In case there is no availabe free frame buffer, this function
+ * In case there is no available free frame buffer, this function
  * returns the eldest frame buffer in the output pool.
  * 
  */
-dpipe_buffer_t *
-dpipe_get(dpipe_t *dpipe) {
-	dpipe_buffer_t *vbuf = NULL;
-	//
+dpipe_buffer_t * dpipe_get(dpipe_t *dpipe) {
+	dpipe_buffer_t *vbuf = NULL;	
 	pthread_mutex_lock(&dpipe->io_mutex);
 	if(dpipe->in != NULL) {
 		// quick path: has available frame buffers
@@ -179,8 +173,7 @@ dpipe_get(dpipe_t *dpipe) {
 			dpipe->out_count--;
 		}
 	}
-	pthread_mutex_unlock(&dpipe->io_mutex);
-	//
+	pthread_mutex_unlock(&dpipe->io_mutex);	
 	return vbuf;
 }
 
@@ -190,8 +183,7 @@ dpipe_get(dpipe_t *dpipe) {
  * @param dpipe [in] The involved pipe
  * @param buffer [in] Pointer to the buffer to be released
  */
-void
-dpipe_put(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
+void dpipe_put(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
 	pthread_mutex_lock(&dpipe->io_mutex);
 	buffer->next = dpipe->in;
 	dpipe->in = buffer;
@@ -212,11 +204,9 @@ dpipe_put(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
  * is available in the output pool.
  * If \a abstime is given, it returns NULL on timed out.
  */
-dpipe_buffer_t *
-dpipe_load(dpipe_t *dpipe, const struct timespec *abstime) {
+dpipe_buffer_t * dpipe_load(dpipe_t *dpipe, const struct timespec *abstime) {
 	dpipe_buffer_t *vbuf = NULL;
-	int failed = 0;
-	//
+	int failed = 0;	
 	pthread_mutex_lock(&dpipe->io_mutex);
 again:
 	if(dpipe->out != NULL) {
@@ -236,7 +226,6 @@ again:
 		goto again;
 	}
 	pthread_mutex_unlock(&dpipe->io_mutex);
-	//
 	return vbuf;
 }
 
@@ -249,10 +238,8 @@ again:
  * This function returns the first frame buffer in the output pool.
  * If there is not a frame in the output pool, it returns NULL immediately.
  */
-dpipe_buffer_t *
-dpipe_load_nowait(dpipe_t *dpipe) {
+dpipe_buffer_t * dpipe_load_nowait(dpipe_t *dpipe) {
 	dpipe_buffer_t *vbuf = NULL;
-	//
 	pthread_mutex_lock(&dpipe->io_mutex);
 	if(dpipe->out != NULL) {
 		vbuf = dpipe->out;
@@ -262,8 +249,7 @@ dpipe_load_nowait(dpipe_t *dpipe) {
 			dpipe->out_tail = NULL;
 		dpipe->out_count--;
 	}
-	pthread_mutex_unlock(&dpipe->io_mutex);
-	//
+	pthread_mutex_unlock(&dpipe->io_mutex);	
 	return vbuf;
 }
 
@@ -274,8 +260,7 @@ dpipe_load_nowait(dpipe_t *dpipe) {
  * @param dpipe [in] The involved pipe
  * @param buffer [in] Pointer to the buffer to be stored.
  */
-void
-dpipe_store(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
+void dpipe_store(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
 	pthread_mutex_lock(&dpipe->io_mutex);
 	// put at the end
 	if(dpipe->out_tail != NULL) {
@@ -285,8 +270,7 @@ dpipe_store(dpipe_t *dpipe, dpipe_buffer_t *buffer) {
 		dpipe->out = dpipe->out_tail = buffer;
 	}
 	buffer->next = NULL;
-	dpipe->out_count++;
-	//
+	dpipe->out_count++;	
 	pthread_mutex_unlock(&dpipe->io_mutex);
 	pthread_cond_signal(&dpipe->cond);
 	return;

@@ -555,7 +555,7 @@ bandwidth_estimator_update(unsigned int ssrc, unsigned short seq, struct timeval
 	bwe_record_t r;
 	map<unsigned int,bwe_record_t>::iterator mi;
 	bool sampleframe = true;
-	//
+	
 	if((mi = bwe_watchlist.find(ssrc)) == bwe_watchlist.end()) {
 		bzero(&r, sizeof(r));
 		r.initTime = rcvtv;
@@ -954,8 +954,7 @@ struct decoder_buffer {
 
 static struct decoder_buffer db[VIDEO_SOURCE_CHANNEL_MAX];
 
-static void
-deinit_decoder_buffer() {
+static void deinit_decoder_buffer() {
 	int i;
 	for(i = 0; i < VIDEO_SOURCE_CHANNEL_MAX; i++) {
 		if(db[i].privbuf_unaligned != NULL) {
@@ -966,12 +965,9 @@ deinit_decoder_buffer() {
 	return;
 }
 
-static int
-init_decoder_buffer() {
+static int init_decoder_buffer() {
 	int i;
-	//
 	deinit_decoder_buffer();
-	//
 	for(i = 0; i < VIDEO_SOURCE_CHANNEL_MAX; i++) {
 		db[i].privbuf_unaligned = (unsigned char*) malloc(PRIVATE_BUFFER_SIZE+16);
 		if(db[i].privbuf_unaligned == NULL) {
@@ -996,11 +992,10 @@ adb_failed:
 	return -1;
 }
 
-static void
-play_video(int channel, unsigned char *buffer, int bufsize, struct timeval pts, bool marker) {
+static void play_video(int channel, unsigned char *buffer, int bufsize, struct timeval pts, bool marker) {
 	struct decoder_buffer *pdb = &db[channel];
 	int left;
-	//
+
 	if(bufsize <= 0 || buffer == NULL) {
 		rtsperror("empty buffer?\n");
 		return;
@@ -1097,14 +1092,12 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 	const unsigned char *srcplanes[SWR_CH_MAX];
 	unsigned char *dstplanes[SWR_CH_MAX];
 	unsigned char *saveptr;
-	int filled = 0;
-	//
+	int filled = 0;	
 	saveptr = pkt->data;
 	while(pkt->size > 0) {
 		int len, got_frame = 0;
 		unsigned char *srcbuf = NULL;
 		int datalen = 0;
-		//
 		av_frame_unref(aframe);
 		if((len = avcodec_decode_audio4(adecoder, aframe, &got_frame, pkt)) < 0) {
 			rtsperror("decode audio failed.\n");
@@ -1115,7 +1108,7 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 			pkt->data += len;
 			continue;
 		}
-		//
+	
 		if(aframe->format == rtspconf->audio_device_format) {
 			datalen = av_samples_get_buffer_size(NULL,
 					aframe->channels/*rtspconf->audio_channels*/,

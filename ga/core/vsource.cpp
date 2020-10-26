@@ -722,8 +722,7 @@ video_source_setup_ex(vsource_config_t *config, int nConfig) {
 	for(idx = 0; idx < nConfig; idx++) {
 		vsource_t *vs = &gVsource[idx];
 		dpipe_buffer_t *data = NULL;
-		char pipename[64];
-		//
+		char pipename[64];		
 		bzero(vs, sizeof(vsource_t));
 		snprintf(pipename, sizeof(pipename), VIDEO_SOURCE_PIPEFORMAT, idx);
 		vs->channel     = idx;
@@ -759,14 +758,12 @@ video_source_setup_ex(vsource_config_t *config, int nConfig) {
 				return -1;
 			}
 		}
-		//
 		ga_error("video-source: %s initialized max-curr-out = (%dx%d)-(%dx%d)-(%dx%d)\n",
 			pipename, vs->max_width, vs->max_height,
 			vs->curr_width, vs->curr_height, vs->out_width, vs->out_height);
 	}
-	//
+
 	gChannels = idx;
-	//
 	return 0;
 }
 
@@ -787,8 +784,7 @@ video_source_setup(int curr_width, int curr_height, int curr_stride) {
 	//config.rtp_id = channel_id;
 	c.curr_width = curr_width;
 	c.curr_height = curr_height;
-	c.curr_stride = curr_stride;
-	//
+	c.curr_stride = curr_stride;	
 	return video_source_setup_ex(&c, 1);
 }
 

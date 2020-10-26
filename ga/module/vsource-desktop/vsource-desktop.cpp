@@ -80,11 +80,9 @@ static int vsource_reconfigured = 0;
  * vsource_init(void *arg)
  * arg is a pointer to a gaRect (if cropping is enabled)
  */
-static int
-vsource_init(void *arg) {
+static int vsource_init(void *arg) {
 	struct RTSPConf *rtspconf = rtspconf_global();
-	struct gaRect *rect = (struct gaRect*) arg;
-	//
+	struct gaRect *rect = (struct gaRect*) arg;	
 	if(vsource_initialized != 0)
 		return 0;
 #ifdef ENABLE_EMBED_COLORCODE
@@ -101,7 +99,6 @@ vsource_init(void *arg) {
 	} else {
 		prect = NULL;
 	}
-	//
 #ifdef WIN32
 	// prevent GetSystemMetrics() get worng numbers
 	// XXX: currently disabled
@@ -165,7 +162,6 @@ vsource_init(void *arg) {
 		return -1;
 	}
 #endif
-	//
 	vsource_initialized = 1;
 	return 0;
 }
@@ -173,8 +169,7 @@ vsource_init(void *arg) {
 /*
  * vsource_threadproc accepts no arguments
  */
-static void *
-vsource_threadproc(void *arg) {
+static void * vsource_threadproc(void *arg) {
 	int i;
 	int token;
 	int frame_interval;
@@ -188,7 +183,6 @@ vsource_threadproc(void *arg) {
 	vsource_framerate_n = rtspconf->video_fps;
 	vsource_framerate_d = 1;
 	vsource_reconfigured = 0;
-	//
 	frame_interval = 1000000/rtspconf->video_fps;	// in the unif of us
 	frame_interval++;
 #ifdef ENABLE_EMBED_COLORCODE
@@ -202,8 +196,8 @@ vsource_threadproc(void *arg) {
 			exit(-1);
 		}
 	}
-	//
-	ga_error("video source thread started: tid=%ld\n", ga_gettid());
+
+	ga_error("video source thread started: thread id=%ld\n", ga_gettid());
 	gettimeofday(&initialTv, NULL);
 	lastTv = initialTv;
 	token = frame_interval;
@@ -226,7 +220,6 @@ vsource_threadproc(void *arg) {
 			token = (frame_interval<<1);
 		}
 		lastTv = captureTv;
-		//
 		if(token < frame_interval) {
 #ifdef WIN32
 			Sleep(1);
@@ -245,19 +238,15 @@ vsource_threadproc(void *arg) {
 		frame->pixelformat = AV_PIX_FMT_BGRA;
 #endif
 		if(prect == NULL) {
-		////////////////////////////////////////
-		frame->realwidth = screenwidth;
-		frame->realheight = screenheight;
-		frame->realstride = screenwidth<<2;
-		frame->realsize = screenheight * frame->realstride;
-		////////////////////////////////////////
+			frame->realwidth = screenwidth;
+			frame->realheight = screenheight;
+			frame->realstride = screenwidth<<2;
+			frame->realsize = screenheight * frame->realstride;
 		} else {
-		////////////////////////////////////////
-		frame->realwidth = prect->width;
-		frame->realheight = prect->height;
-		frame->realstride = prect->width<<2;
-		frame->realsize = prect->height * frame->realstride;
-		////////////////////////////////////////
+			frame->realwidth = prect->width;
+			frame->realheight = prect->height;
+			frame->realstride = prect->width<<2;
+			frame->realsize = prect->height * frame->realstride;
 		}
 		frame->linesize[0] = frame->realstride/*frame->stride*/;
 #ifdef WIN32
@@ -291,10 +280,8 @@ vsource_threadproc(void *arg) {
 			dpipe_buffer_t *dupdata;
 			vsource_frame_t *dupframe;
 			dupdata = dpipe_get(pipe[i]);
-			dupframe = (vsource_frame_t*) dupdata->pointer;
-			//
+			dupframe = (vsource_frame_t*)dupdata->pointer;
 			vsource_dup_frame(frame, dupframe);
-			//
 			dpipe_store(pipe[i], dupdata);
 		}
 		dpipe_store(pipe[0], data);
@@ -307,14 +294,12 @@ vsource_threadproc(void *arg) {
 				vsource_framerate_n, vsource_framerate_d, frame_interval);
 		}
 	}
-	//
+
 	ga_error("video source: thread terminated.\n");
-	//
 	return NULL;
 }
 
-static int
-vsource_deinit(void *arg) {
+static int vsource_deinit(void *arg) {
 	if(vsource_initialized == 0)
 		return 0;
 #ifdef WIN32
@@ -338,8 +323,7 @@ vsource_deinit(void *arg) {
 	return 0;
 }
 
-static int
-vsource_start(void *arg) {
+static int vsource_start(void *arg) {
 	if(vsource_started != 0)
 		return 0;
 	vsource_started = 1;
@@ -352,23 +336,21 @@ vsource_start(void *arg) {
 	return 0;
 }
 
-static int
-vsource_stop(void *arg) {
+static int vsource_stop(void *arg) {
 	if(vsource_started == 0)
 		return 0;
+
 	vsource_started = 0;
 	pthread_cancel(vsource_tid);
 	return 0;
 }
 
-static int
-vsource_ioctl(int command, int argsize, void *arg) {
+static int vsource_ioctl(int command, int argsize, void *arg) {
 	int ret = 0;
-	ga_ioctl_reconfigure_t *reconf = (ga_ioctl_reconfigure_t*) arg;
-	//
+	ga_ioctl_reconfigure_t *reconf = (ga_ioctl_reconfigure_t*) arg;	
 	if(vsource_initialized == 0)
 		return GA_IOCTL_ERR_NOTINITIALIZED;
-	//
+
 	switch(command) {
 	case GA_IOCTL_RECONFIGURE:
 		if(argsize != sizeof(ga_ioctl_reconfigure_t))
@@ -394,8 +376,7 @@ vsource_ioctl(int command, int argsize, void *arg) {
 	return ret;
 }
 
-ga_module_t *
-module_load() {
+ga_module_t * module_load() {
 	static ga_module_t m;
 	bzero(&m, sizeof(m));
 	m.type = GA_MODULE_TYPE_VSOURCE;
@@ -407,4 +388,3 @@ module_load() {
 	m.ioctl = vsource_ioctl;
 	return &m;
 }
-

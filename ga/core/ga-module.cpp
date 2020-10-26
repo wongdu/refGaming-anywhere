@@ -55,8 +55,7 @@ static map<ga_module_t *, HMODULE> mlist;
  * This function has to return an instance of the \em ga_module_t,
  * which is then returned to the caller of this function.
  */
-ga_module_t *
-ga_load_module(const char *modname, const char *prefix) {
+ga_module_t * ga_load_module(const char *modname, const char *prefix) {
 	char fn[1024];
 	ga_module_t *m;
 	HMODULE handle;
@@ -68,7 +67,6 @@ ga_load_module(const char *modname, const char *prefix) {
 #else
 	snprintf(fn, sizeof(fn), "%s.so", modname);
 #endif
-	//
 	if((handle = dlopen(fn, RTLD_NOW|RTLD_LOCAL)) == NULL) {
 		ga_error("ga_load_module: load module (%s) failed - %s.\n", fn, dlerror());
 		return NULL;
@@ -81,7 +79,6 @@ ga_load_module(const char *modname, const char *prefix) {
 	if((m = do_module_load()) != NULL) {
 		mlist[m] = handle;
 	}
-	//
 	return m;
 }
 
@@ -90,8 +87,7 @@ ga_load_module(const char *modname, const char *prefix) {
  *
  * @param m [in] Pointer to a loaded module.
  */
-void
-ga_unload_module(ga_module_t *m) {
+void ga_unload_module(ga_module_t *m) {
 	map<ga_module_t *, HMODULE>::iterator mi;
 	if(m == NULL)
 		return;
@@ -111,8 +107,7 @@ ga_unload_module(ga_module_t *m) {
  *	Note that the argument could be different for different types of module.
  * @return 0 on success, or -1 on error.
  */
-int
-ga_init_single_module(const char *name, ga_module_t *m, void *arg) {
+int ga_init_single_module(const char *name, ga_module_t *m, void *arg) {
 	if(m->init == NULL)
 		return 0;
 	if(m->init(arg) < 0) {
@@ -133,8 +128,7 @@ ga_init_single_module(const char *name, ga_module_t *m, void *arg) {
  * This function calls \em ga_init_single_module, and quit the program
  * if an error is returned from that function.
  */
-void
-ga_init_single_module_or_quit(const char *name, ga_module_t *m, void *arg) {
+void ga_init_single_module_or_quit(const char *name, ga_module_t *m, void *arg) {
 	if(ga_init_single_module(name, m, arg) < 0)
 		exit(-1);
 	return;
@@ -151,8 +145,7 @@ ga_init_single_module_or_quit(const char *name, ga_module_t *m, void *arg) {
  * It is not recommended to use this function.
  * Use module->start() instead on modern module implementations.
  */
-int
-ga_run_single_module(const char *name, void * (*threadproc)(void*), void *arg) {
+int ga_run_single_module(const char *name, void * (*threadproc)(void*), void *arg) {
 	pthread_t t;
 	if(threadproc == NULL)
 		return 0;
@@ -173,8 +166,7 @@ ga_run_single_module(const char *name, void * (*threadproc)(void*), void *arg) {
  * @param arg [in] The argument pass to the thread procedure.
  * @return 0 on success, or -1 on error.
  */
-void
-ga_run_single_module_or_quit(const char *name, void * (*threadproc)(void*), void *arg) {
+void ga_run_single_module_or_quit(const char *name, void * (*threadproc)(void*), void *arg) {
 	if(ga_run_single_module(name, threadproc, arg) < 0)
 		exit(-1);
 	return;
@@ -192,8 +184,7 @@ ga_run_single_module_or_quit(const char *name, void * (*threadproc)(void*), void
  *
  * This function returns 0 (no error) if the interface is not defined.
  */
-int
-ga_module_init(ga_module_t *m, void *arg) {
+int ga_module_init(ga_module_t *m, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->init == NULL)
@@ -211,8 +202,7 @@ ga_module_init(ga_module_t *m, void *arg) {
  * This function ensures that a module has defined the \em start interface
  * before calling the interface.
  */
-int
-ga_module_start(ga_module_t *m, void *arg) {
+int ga_module_start(ga_module_t *m, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->start == NULL)
@@ -232,8 +222,7 @@ ga_module_start(ga_module_t *m, void *arg) {
  *
  * This function returns 0 (no error) if the interface is not defined.
  */
-int
-ga_module_stop(ga_module_t *m, void *arg) {
+int ga_module_stop(ga_module_t *m, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->stop == NULL)
@@ -253,8 +242,7 @@ ga_module_stop(ga_module_t *m, void *arg) {
  *
  * This function returns 0 (no error) if the interface is not defined.
  */
-int
-ga_module_deinit(ga_module_t *m, void *arg) {
+int ga_module_deinit(ga_module_t *m, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->deinit == NULL)
@@ -274,8 +262,7 @@ ga_module_deinit(ga_module_t *m, void *arg) {
  * This function ensures that a module has defined the \em ioctl interface
  * before sending ioctl commands.
  */
-int
-ga_module_ioctl(ga_module_t *m, int command, int argsize, void *arg) {
+int ga_module_ioctl(ga_module_t *m, int command, int argsize, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->ioctl == NULL)
@@ -295,8 +282,7 @@ ga_module_ioctl(ga_module_t *m, int command, int argsize, void *arg) {
  *
  * This function returns 0 (no error) if the interface is not defined.
  */
-int
-ga_module_notify(ga_module_t *m, void *arg) {
+int ga_module_notify(ga_module_t *m, void *arg) {
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->notify == NULL)
@@ -315,8 +301,7 @@ ga_module_notify(ga_module_t *m, void *arg) {
  * This function ensures that a module has defined the \em raw interface
  * before calling the interface.
  */
-void *
-ga_module_raw(ga_module_t *m, void *arg, int *size) {
+void * ga_module_raw(ga_module_t *m, void *arg, int *size) {
 	if(m == NULL)
 		return NULL;
 	if(m->raw == NULL)
@@ -340,9 +325,8 @@ ga_module_raw(ga_module_t *m, void *arg, int *size) {
  * This function ensures that a module has defined the \em send_packet interface
  * before calling the interface.
  */
-int
-ga_module_send_packet(ga_module_t *m, const char *prefix, int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
-#if 0	/* not checked: for performance considersation */
+int ga_module_send_packet(ga_module_t *m, const char *prefix, int channelId, AVPacket *pkt, int64_t encoderPts, struct timeval *ptv) {
+#if 0	/* not checked: for performance consideration */
 	if(m == NULL)
 		return GA_IOCTL_ERR_NULLMODULE;
 	if(m->send_packet == NULL)

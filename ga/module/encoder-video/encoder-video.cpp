@@ -91,12 +91,11 @@ static int vencoder_deinit(void *arg) {
 	bzero(_spslen, sizeof(_spslen));
 	bzero(_ppslen, sizeof(_ppslen));
 	vencoder_initialized = 0;
-	ga_error("video encoder: deinitialized.\n");
+	ga_error("video encoder: deInitialized.\n");
 	return 0;
 }
 
-static int
-vencoder_init(void *arg) {
+static int vencoder_init(void *arg) {
 	int iid;
 	char *pipefmt = (char*) arg;
 	struct RTSPConf *rtspconf = rtspconf_global();
@@ -165,8 +164,7 @@ init_failed:
 	return -1;
 }
 
-static int
-vencoder_reconfigure(int iid) {
+static int vencoder_reconfigure(int iid) {
 	struct RTSPConf *rtspconf = rtspconf_global();
 	int ret = 0;
 	ga_ioctl_reconfigure_t *reconf = &vencoder_reconf[iid];
@@ -180,7 +178,6 @@ vencoder_reconfigure(int iid) {
 		ga_avcodec_close(vencoder[iid]);
 		// ga_error("Closing encoder context\n");
 		// avcodec_close(vencoder[iid]);
-
 		for (int i = 0; i < rtspconf->vso->size(); i += 2) {
 			if ((*rtspconf->vso)[i].compare("b") == 0) {
 				if (reconf->bitrateKbps > 0)
@@ -221,8 +218,7 @@ vencoder_reconfigure(int iid) {
 	return ret;
 }
 
-static void *
-vencoder_threadproc(void *arg) {
+static void * vencoder_threadproc(void *arg) {
 	// arg is pointer to source pipename
 	int iid, outputW, outputH;
 	vsource_frame_t *frame = NULL;
@@ -340,7 +336,7 @@ vencoder_threadproc(void *arg) {
 		}*/
 		if (bRequestKeyframe && pic_in){
 			pic_in->pict_type = AV_PICTURE_TYPE_I;
-			ga_log("int vencoder_threadproc request I frame\n");
+			ga_log("in vencoder thread request I frame\n");
 		}
 		
 		if(avcodec_encode_video2(encoder, &pkt, pic_in, &got_packet) < 0) {
@@ -365,7 +361,7 @@ vencoder_threadproc(void *arg) {
 			}*/
 
 			pkt.stream_index = 0;
-#if 0			// XXX: dump naltype
+#if 0			// XXX: dump nalType
 			do {
 				int codelen;
 				unsigned char *ptr;
@@ -418,15 +414,17 @@ video_quit:
 	if(pipe) {
 		pipe = NULL;
 	}	
-	if(pic_in_buf)	av_free(pic_in_buf);
-	if(pic_in)	av_free(pic_in);
-	if(nalbuf)	free(nalbuf);	
+	if(pic_in_buf)
+		av_free(pic_in_buf);
+	if(pic_in)
+		av_free(pic_in);
+	if(nalbuf)
+		free(nalbuf);	
 	ga_error("video encoder: thread terminated (thread id=%ld).\n", ga_gettid());
 	return NULL;
 }
 
-static int
-vencoder_start(void *arg) {
+static int vencoder_start(void *arg) {
 	int iid;
 	char *pipefmt = (char*) arg;
 #ifdef SAVE_ENC
@@ -436,7 +434,6 @@ vencoder_start(void *arg) {
 	}
 #endif
 	ga_log("call vencoder_start\n");
-
 #define	MAXPARAMLEN	64
 	static char pipename[VIDEO_SOURCE_CHANNEL_MAX][MAXPARAMLEN];
 	if(vencoder_started != 0)
@@ -451,12 +448,11 @@ vencoder_start(void *arg) {
 			return -1;
 		}
 	}
-	ga_error("video encdoer: all started (%d)\n", iid);
+	ga_error("video encoder: all started (%d)\n", iid);
 	return 0;
 }
 
-static int
-vencoder_stop(void *arg) {
+static int vencoder_stop(void *arg) {
 	int iid;
 	void *ignored;
 	if(vencoder_started == 0)
@@ -466,12 +462,11 @@ vencoder_stop(void *arg) {
 	for(iid = 0; iid < video_source_channels(); iid++) {
 		pthread_join(vencoder_tid[iid], &ignored);
 	}
-	ga_error("video encdoer: all stopped (%d)\n", iid);
+	ga_error("video encoder: all stopped (%d)\n", iid);
 	return 0;
 }
 
-static void *
-vencoder_raw(void *arg, int *size) {
+static void * vencoder_raw(void *arg, int *size) {
 #if defined __APPLE__
 	int64_t in = (int64_t) arg;
 	int iid = (int) (in & 0xffffffffLL);
@@ -487,9 +482,8 @@ vencoder_raw(void *arg, int *size) {
 	return vencoder[iid];
 }
 
-/* find startcode: XXX: only 00 00 00 01 - a simplified version */
-static unsigned char *
-find_startcode(unsigned char *data, unsigned char *end) {
+/* find startCode: XXX: only 00 00 00 01 - a simplified version */
+static unsigned char * find_startcode(unsigned char *data, unsigned char *end) {
 	unsigned char *r;
 	for(r = data; r < end - 4; r++) {
 		if(r[0] == 0
@@ -501,8 +495,7 @@ find_startcode(unsigned char *data, unsigned char *end) {
 	return end;
 }
 
-static int
-h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
+static int h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
 	int ret = -1;
 	unsigned char *r;
 	unsigned char *sps = NULL, *pps = NULL, *vps = NULL;
@@ -581,7 +574,6 @@ h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
 			_vpslen[channelId] = vpslen;
 			bcopy(vps, _vps[channelId], vpslen);
 		}
-		//
 		if(type == 265) {
 			if(vps == NULL)
 				goto error_get_h264or5_vparam;
@@ -594,7 +586,7 @@ h264or5_get_vparam(int type, int channelId, unsigned char *data, int datalen) {
 				sps-data, _spslen[channelId],
 				pps-data, _ppslen[channelId]);
 		}
-		//
+	
 		ret = 0;
 	}
 	return ret;
@@ -607,8 +599,7 @@ error_get_h264or5_vparam:
 	return -1;
 }
 
-static AVCodecContext *
-vencoder_opt_get_encoder(int cid) {
+static AVCodecContext * vencoder_opt_get_encoder(int cid) {
 	AVCodecContext *ve = NULL;
 	if(vencoder_initialized == 0)
 		return NULL;
@@ -620,12 +611,10 @@ vencoder_opt_get_encoder(int cid) {
 	return ve;
 }
 
-static int
-vencoder_ioctl(int command, int argsize, void *arg) {
+static int vencoder_ioctl(int command, int argsize, void *arg) {
 	int ret = 0;
 	ga_ioctl_buffer_t *buf = (ga_ioctl_buffer_t*) arg;
-	AVCodecContext *ve = NULL;
-	//
+	AVCodecContext *ve = NULL;	
 	ga_log("call vencoder_ioctl command:%d,argsize:%d\n", command, argsize);
 	switch(command) {
 	case GA_IOCTL_RECONFIGURE:
@@ -678,12 +667,10 @@ vencoder_ioctl(int command, int argsize, void *arg) {
 	return ret;
 }
 
-ga_module_t *
-module_load() {
+ga_module_t * module_load() {
 	static ga_module_t m;
 	//struct RTSPConf *rtspconf = rtspconf_global();
 	char mime[64];
-	//
 	bzero(&m, sizeof(m));
 	m.type = GA_MODULE_TYPE_VENCODER;
 	m.name = strdup("ffmpeg-video-encoder");
@@ -695,7 +682,6 @@ module_load() {
 	//m.threadproc = vencoder_threadproc;
 	m.stop = vencoder_stop;
 	m.deinit = vencoder_deinit;
-	//
 	m.raw = vencoder_raw;
 	m.ioctl = vencoder_ioctl;
 	return &m;

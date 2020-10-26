@@ -152,12 +152,12 @@ ctrl_queue_write_msg(void *msg, int msgsize) {
 		ga_error("controller queue: buffer released.\n");
 		return 0;
 	}
-	//
+
 	nextpos = qtail + qunit;
 	if(nextpos == qsize) {
 		nextpos = 0;
 	}
-	//
+	
 	if(nextpos == qhead) {
 		// queue is full
 		msgsize = 0;
@@ -169,12 +169,11 @@ ctrl_queue_write_msg(void *msg, int msgsize) {
 		qtail = nextpos;
 	}
 	pthread_mutex_unlock(&queue_mutex);
-	//
+
 	return msgsize;
 }
 
-void
-ctrl_queue_clear() {
+void ctrl_queue_clear() {
 	pthread_mutex_lock(&queue_mutex);
 	qhead = qtail = 0;
 	pthread_mutex_unlock(&queue_mutex);
@@ -182,9 +181,7 @@ ctrl_queue_clear() {
 
 ////////////////////////////////////////////////////////////////////
 
-int
-ctrl_socket_init(struct RTSPConf *conf) {
-	//
+int ctrl_socket_init(struct RTSPConf *conf) {
 	if(conf->ctrlproto == IPPROTO_TCP) {
 		ctrlsocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	} else if(conf->ctrlproto == IPPROTO_UDP) {
@@ -196,7 +193,6 @@ ctrl_socket_init(struct RTSPConf *conf) {
 	if(ctrlsocket < 0) {
 		ga_error("Controller socket-init: %s\n", strerror(errno));
 	}
-	//
 	bzero(&ctrlsin, sizeof(struct sockaddr_in));
 	ctrlsin.sin_family = AF_INET;
 	ctrlsin.sin_port = htons(conf->ctrlport);
@@ -209,14 +205,11 @@ ctrl_socket_init(struct RTSPConf *conf) {
 	}
 	ga_error("controller socket: socket address [%s:%u]\n",
 		inet_ntoa(ctrlsin.sin_addr), ntohs(ctrlsin.sin_port));
-	//
+
 	return ctrlsocket;
 }
 
-////////////////////////////////////////////////////////////////////
-
-int
-ctrl_client_init(struct RTSPConf *conf, const char *ctrlid) {
+int ctrl_client_init(struct RTSPConf *conf, const char *ctrlid) {
 	if(ctrl_socket_init(conf) < 0) {
 		conf->ctrlenable = 0;
 		return -1;
