@@ -47,7 +47,6 @@ static FILE *savefp = NULL;
 /*	1st ptr: source pipeline */
 /*	2nd ptr: destination pipeline */
 /* the number of pipeline(s) is equivalent to the number of video source(s) */
-
 static int filter_RGB2YUV_init(void *arg) {
 	// arg is image source id
 	int iid;
