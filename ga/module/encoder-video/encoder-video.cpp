@@ -100,19 +100,17 @@ vencoder_init(void *arg) {
 	int iid;
 	char *pipefmt = (char*) arg;
 	struct RTSPConf *rtspconf = rtspconf_global();
-	//
 	if(rtspconf == NULL) {
 		ga_error("video encoder: no configuration found\n");
 		return -1;
 	}
 	if(vencoder_initialized != 0)
 		return 0;
-	//
+
 	for(iid = 0; iid < video_source_channels(); iid++) {
 		char pipename[64];
 		int outputW, outputH;
 		dpipe_t *pipe;
-		//
 		_sps[iid] = _pps[iid] = NULL;
 		_spslen[iid] = _ppslen[iid] = 0;
 		pthread_mutex_init(&vencoder_reconf_mutex[iid], NULL);
@@ -231,8 +229,7 @@ vencoder_threadproc(void *arg) {
 	char *pipename = (char*) arg;
 	dpipe_t *pipe = dpipe_lookup(pipename);
 	dpipe_buffer_t *data = NULL;
-	AVCodecContext *encoder = NULL;
-	//
+	AVCodecContext *encoder = NULL;	
 	AVFrame *pic_in = NULL;
 	unsigned char *pic_in_buf = NULL;
 	int pic_in_size;
@@ -241,31 +238,29 @@ vencoder_threadproc(void *arg) {
 	long long basePts = -1LL, newpts = 0LL, pts = -1LL, ptsSync = 0LL;
 	pthread_mutex_t condMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-	//
-	int video_written = 0;
-	//
+	
+	int video_written = 0;	
 	if(pipe == NULL) {
 		ga_error("video encoder: invalid pipeline specified (%s).\n", pipename);
 		goto video_quit;
 	}
-	//
+
 	rtspconf = rtspconf_global();
 	// init variables
 	iid = pipe->channel_id;
 	encoder = vencoder[iid];
-	//
 	outputW = video_source_out_width(iid);
 	outputH = video_source_out_height(iid);
-	//
+
 	encoder_pts_clear(iid);
-	//
+
 	nalbuf_size = 100000+12 * outputW * outputH;
 	if(ga_malloc(nalbuf_size, (void**) &nalbuf, &nalign) < 0) {
 		ga_error("video encoder: buffer allocation failed, terminated.\n");
 		goto video_quit;
 	}
 	nalbuf_a = nalbuf + nalign;
-	//
+	
 	if((pic_in = av_frame_alloc()) == NULL) {
 		ga_error("video encoder: picture allocation failed, terminated.\n");
 		goto video_quit;
@@ -282,11 +277,11 @@ vencoder_threadproc(void *arg) {
 			AV_PIX_FMT_YUV420P, outputW, outputH);
 	//ga_error("video encoder: linesize = %d|%d|%d\n", pic_in->linesize[0], pic_in->linesize[1], pic_in->linesize[2]);
 	// start encoding
-	ga_error("video encoding started: tid=%ld %dx%d@%dfps, nalbuf_size=%d, pic_in_size=%d.\n",
+	ga_error("video encoding started: thread id=%ld %dx%d@%d fps, nalbuf_size=%d, pic_in_size=%d.\n",
 		ga_gettid(),
 		outputW, outputH, rtspconf->video_fps,
 		nalbuf_size, pic_in_size);
-	//
+	
 	int tempCount = 0;
 	while(vencoder_started != 0 && encoder_running() > 0) {
 		// Reconfigure encoder (if required)
@@ -301,7 +296,7 @@ vencoder_threadproc(void *arg) {
 		to.tv_nsec = tv.tv_usec * 1000;
 		data = dpipe_load(pipe, &to);
 		if(data == NULL) {
-			ga_error("viedo encoder: image source timed out.\n");
+			ga_error("video encoder: image source timed out.\n");
 			continue;
 		}
 		frame = (vsource_frame_t*) data->pointer;
@@ -377,14 +372,13 @@ vencoder_threadproc(void *arg) {
 				fprintf(stderr, "[XXX-naldump]");
 				for(	ptr = ga_find_startcode(pkt.data, pkt.data+pkt.size, &codelen);
 					ptr != NULL;
-					ptr = ga_find_startcode(ptr+codelen, pkt.data+pkt.size, &codelen)) {
-					//
+					ptr = ga_find_startcode(ptr+codelen, pkt.data+pkt.size, &codelen)) {					
 					fprintf(stderr, " (+%d|%d)-%02x", ptr-pkt.data, codelen, ptr[codelen] & 0x1f);
 				}
 				fprintf(stderr, "\n");
 			} while(0);
 #endif
-			//
+			
 			if(pkt.pts != AV_NOPTS_VALUE) {
 				if(encoder_ptv_get(iid, pkt.pts, &tv, 0) == NULL) {
 					gettimeofday(&tv, NULL);
@@ -419,18 +413,15 @@ vencoder_threadproc(void *arg) {
 			}
 		}
 	}
-	//
+
 video_quit:
 	if(pipe) {
 		pipe = NULL;
-	}
-	//
+	}	
 	if(pic_in_buf)	av_free(pic_in_buf);
 	if(pic_in)	av_free(pic_in);
-	if(nalbuf)	free(nalbuf);
-	//
-	ga_error("video encoder: thread terminated (tid=%ld).\n", ga_gettid());
-	//
+	if(nalbuf)	free(nalbuf);	
+	ga_error("video encoder: thread terminated (thread id=%ld).\n", ga_gettid());
 	return NULL;
 }
 
