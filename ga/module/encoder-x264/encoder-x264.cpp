@@ -59,8 +59,7 @@ static int _ppslen[VIDEO_SOURCE_CHANNEL_MAX];
 static FILE *fsaveenc = NULL;
 #endif
 
-static int
-vencoder_deinit(void *arg) {
+static int vencoder_deinit(void *arg) {
 	int iid;
 #ifdef SAVEENC
 	if(fsaveenc != NULL) {
@@ -83,7 +82,7 @@ vencoder_deinit(void *arg) {
 	bzero(_spslen, sizeof(_spslen));
 	bzero(_ppslen, sizeof(_ppslen));
 	vencoder_initialized = 0;
-	ga_error("video encoder: deinitialized.\n");
+	ga_error("video encoder: deInitialized.\n");
 	return 0;
 }
 
@@ -95,15 +94,13 @@ ga_x264_param_parse_bit(x264_param_t *params, const char *name, const char *bitv
 	return x264_param_parse(params, name, kbit);
 }
 
-static int
-vencoder_init(void *arg) {
+static int vencoder_init(void *arg) {
 	int iid;
 	char *pipefmt = (char*) arg;
 	struct RTSPConf *rtspconf = rtspconf_global();
 	char profile[16], preset[16], tune[16];
 	char x264params[1024];
 	char tmpbuf[64];
-	//
 	if(rtspconf == NULL) {
 		ga_error("video encoder: no configuration found\n");
 		return -1;
@@ -116,26 +113,23 @@ vencoder_init(void *arg) {
 		int outputW, outputH;
 		dpipe_t *pipe;
 		x264_param_t params;
-		//
 		_sps[iid] = _pps[iid] = NULL;
 		_spslen[iid] = _ppslen[iid] = 0;
 		pthread_mutex_init(&vencoder_reconf_mutex[iid], NULL);
 		vencoder_reconf[iid].id = -1;
-		//
 		snprintf(pipename, sizeof(pipename), pipefmt, iid);
 		outputW = video_source_out_width(iid);
 		outputH = video_source_out_height(iid);
 		if(outputW % 4 != 0 || outputH % 4 != 0) {
-			ga_error("video encoder: unsupported resolutin %dx%d\n", outputW, outputH);
+			ga_error("video encoder: unsupported resolution %dx%d\n", outputW, outputH);
 			goto init_failed;
 		}
 		if((pipe = dpipe_lookup(pipename)) == NULL) {
 			ga_error("video encoder: pipe %s is not found\n", pipename);
 			goto init_failed;
 		}
-		ga_error("video encoder: video source #%d from '%s' (%dx%d).\n",
-			iid, pipe->name, outputW, outputH, iid);
-		//
+		ga_error("video encoder: video source #%d from '%s' (%dx%d).\n",iid, pipe->name, outputW, outputH, iid);
+		
 		bzero(&params, sizeof(params));
 		x264_param_default(&params);
 		// fill params
@@ -150,7 +144,7 @@ vencoder_init(void *arg) {
 				ga_error("video encoder: x264 preset=%s; tune=%s\n", preset, tune); 
 			}
 		}
-		//
+		
 		if(ga_conf_mapreadv("video-specific", "b", tmpbuf, sizeof(tmpbuf)) != NULL)
 			ga_x264_param_parse_bit(&params, "bitrate", tmpbuf);
 		if(ga_conf_mapreadv("video-specific", "crf", tmpbuf, sizeof(tmpbuf)) != NULL)
@@ -171,7 +165,7 @@ vencoder_init(void *arg) {
 			x264_param_parse(&params, "keyint", tmpbuf);
 		if(ga_conf_mapreadv("video-specific", "intra-refresh", tmpbuf, sizeof(tmpbuf)) != NULL)
 			x264_param_parse(&params, "intra-refresh", tmpbuf);
-		//
+	
 		x264_param_parse(&params, "bframes", "0");
 		x264_param_apply_fastfirstpass(&params);
 		if(ga_conf_mapreadv("video-specific", "profile", profile, sizeof(profile)) != NULL) {
@@ -180,7 +174,7 @@ vencoder_init(void *arg) {
 				goto init_failed;
 			}
 		}
-		//
+	
 		if(ga_conf_readv("video-fps", tmpbuf, sizeof(tmpbuf)) != NULL)
 			x264_param_parse(&params, "fps", tmpbuf);
 		if(ga_conf_mapreadv("video-specific", "threads", tmpbuf, sizeof(tmpbuf)) != NULL)
@@ -209,7 +203,7 @@ vencoder_init(void *arg) {
 				name = strtok_r(NULL, ":", &saveptr);
 			}
 		}
-		//
+
 		vencoder[iid] = x264_encoder_open(&params);
 		if(vencoder[iid] == NULL)
 			goto init_failed;
@@ -236,18 +230,15 @@ init_failed:
 	return -1;
 }
 
-static int
-vencoder_reconfigure(int iid) {
+static int vencoder_reconfigure(int iid) {
 	int ret = 0;
 	x264_param_t params;
 	x264_t *encoder = vencoder[iid];
-	ga_ioctl_reconfigure_t *reconf = &vencoder_reconf[iid];
-	//
+	ga_ioctl_reconfigure_t *reconf = &vencoder_reconf[iid];	
 	pthread_mutex_lock(&vencoder_reconf_mutex[iid]);
 	if(vencoder_reconf[iid].id >= 0) {
 		int doit = 0;
 		x264_encoder_parameters(encoder, &params);
-		//
 		if(reconf->crf > 0) {
 			params.rc.f_rf_constant = 1.0 * reconf->crf;
 			doit++;
@@ -268,7 +259,7 @@ vencoder_reconfigure(int iid) {
 			params.rc.i_vbv_buffer_size = reconf->bufsize;
 			doit++;
 		}
-		//
+	
 		if(doit > 0) {
 			if(x264_encoder_reconfig(encoder, &params) < 0) {
 				ga_error("video encoder: reconfigure failed. crf=%d; framerate=%d/%d; bitrate=%d; bufsize=%d.\n",
@@ -291,8 +282,7 @@ vencoder_reconfigure(int iid) {
 	return ret;
 }
 
-static void *
-vencoder_threadproc(void *arg) {
+static void * vencoder_threadproc(void *arg) {
 	// arg is pointer to source pipename
 	int iid, outputW, outputH;
 	vsource_frame_t *frame = NULL;
@@ -300,26 +290,22 @@ vencoder_threadproc(void *arg) {
 	dpipe_t *pipe = dpipe_lookup(pipename);
 	dpipe_buffer_t *data = NULL;
 	x264_t *encoder = NULL;
-	//
 	long long basePts = -1LL, newpts = 0LL, pts = -1LL, ptsSync = 0LL;
 	pthread_mutex_t condMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-	//
 	unsigned char *pktbuf = NULL;
 	int pktbufsize = 0, pktbufmax = 0;
 	int video_written = 0;
 	int64_t x264_pts = 0;
-	//
 	if(pipe == NULL) {
 		ga_error("video encoder: invalid pipeline specified (%s).\n", pipename);
 		goto video_quit;
 	}
-	//
+
 	rtspconf = rtspconf_global();
 	// init variables
 	iid = pipe->channel_id;
 	encoder = vencoder[iid];
-	//
 	outputW = video_source_out_width(iid);
 	outputH = video_source_out_height(iid);
 	pktbufmax = outputW * outputH * 2;
@@ -358,9 +344,8 @@ vencoder_threadproc(void *arg) {
 		} else {
 			newpts = ptsSync + frame->imgpts - basePts;
 		}
-		//
-		x264_picture_init(&pic_in);
-		//
+
+		x264_picture_init(&pic_in);	
 		pic_in.img.i_csp = X264_CSP_I420;
 		pic_in.img.i_plane = 3;
 		pic_in.img.i_stride[0] = frame->linesize[0];
@@ -494,7 +479,7 @@ vencoder_threadproc(void *arg) {
 			}
 		}
 	}
-	//
+
 video_quit:
 	if(pipe) {
 		pipe = NULL;
@@ -503,14 +488,11 @@ video_quit:
 		free(pktbuf);
 	}
 	pktbuf = NULL;
-	//
-	ga_error("video encoder: thread terminated (tid=%ld).\n", ga_gettid());
-	//
+	ga_error("video encoder: thread terminated (thread id=%ld).\n", ga_gettid());
 	return NULL;
 }
 
-static int
-vencoder_start(void *arg) {
+static int vencoder_start(void *arg) {
 	int iid;
 	char *pipefmt = (char*) arg;
 #define	MAXPARAMLEN	64
@@ -527,12 +509,11 @@ vencoder_start(void *arg) {
 			return -1;
 		}
 	}
-	ga_error("video encdoer: all started (%d)\n", iid);
+	ga_error("video encoder: all started (%d)\n", iid);
 	return 0;
 }
 
-static int
-vencoder_stop(void *arg) {
+static int vencoder_stop(void *arg) {
 	int iid;
 	void *ignored;
 	if(vencoder_started == 0)
@@ -542,12 +523,11 @@ vencoder_stop(void *arg) {
 	for(iid = 0; iid < video_source_channels(); iid++) {
 		pthread_join(vencoder_tid[iid], &ignored);
 	}
-	ga_error("video encdoer: all stopped (%d)\n", iid);
+	ga_error("video encoder: all stopped (%d)\n", iid);
 	return 0;
 }
 
-static void *
-vencoder_raw(void *arg, int *size) {
+static void * vencoder_raw(void *arg, int *size) {
 #if defined __APPLE__
 	int64_t in = (int64_t) arg;
 	int iid = (int) (in & 0xffffffffLL);
@@ -575,15 +555,13 @@ x264_reconfigure(ga_ioctl_reconfigure_t *reconf) {
 	return 0;
 }
 
-static int
-x264_get_sps_pps(int iid) {
+static int x264_get_sps_pps(int iid) {
 	x264_nal_t *p_nal;
 	int ret = 0;
 	int i, i_nal;
-	// alread obtained?
+	// already obtained?
 	if(_sps[iid] != NULL)
 		return 0;
-	//
 	if(vencoder_initialized == 0)
 		return GA_IOCTL_ERR_NOTINITIALIZED;
 	if(x264_encoder_headers(vencoder[iid], &p_nal, &i_nal) < 0)
@@ -605,7 +583,7 @@ x264_get_sps_pps(int iid) {
 			_ppslen[iid] = p_nal[i].i_payload;
 		}
 	}
-	//
+
 	if(_sps[iid] == NULL || _pps[iid] == NULL) {
 		if(_sps[iid])	free(_sps[iid]);
 		if(_pps[iid])	free(_pps[iid]);
@@ -618,14 +596,12 @@ x264_get_sps_pps(int iid) {
 	return ret;
 }
 
-static int
-vencoder_ioctl(int command, int argsize, void *arg) {
+static int vencoder_ioctl(int command, int argsize, void *arg) {
 	int ret = 0;
 	ga_ioctl_buffer_t *buf = (ga_ioctl_buffer_t*) arg;
-	//
 	if(vencoder_initialized == 0)
 		return GA_IOCTL_ERR_NOTINITIALIZED;
-	//
+
 	switch(command) {
 	case GA_IOCTL_RECONFIGURE:
 		if(argsize != sizeof(ga_ioctl_reconfigure_t))
@@ -659,10 +635,8 @@ vencoder_ioctl(int command, int argsize, void *arg) {
 	return ret;
 }
 
-ga_module_t *
-module_load() {
+ga_module_t * module_load() {
 	static ga_module_t m;
-	//
 	bzero(&m, sizeof(m));
 	m.type = GA_MODULE_TYPE_VENCODER;
 	m.name = strdup("x264-video-encoder");
@@ -672,7 +646,6 @@ module_load() {
 	//m.threadproc = vencoder_threadproc;
 	m.stop = vencoder_stop;
 	m.deinit = vencoder_deinit;
-	//
 	m.raw = vencoder_raw;
 	m.ioctl = vencoder_ioctl;
 	return &m;

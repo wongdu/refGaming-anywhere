@@ -61,13 +61,11 @@ using namespace std;
 
 static struct RTSPConf globalConf;
 
-struct RTSPConf *
-rtspconf_global() {
+struct RTSPConf * rtspconf_global() {
 	return &globalConf;
 }
 
-int
-rtspconf_init(struct RTSPConf *conf) {
+int rtspconf_init(struct RTSPConf *conf) {
 	if(conf == NULL)
 		return -1;
 	memset(conf, 0, sizeof(struct RTSPConf));
@@ -82,7 +80,6 @@ rtspconf_init(struct RTSPConf *conf) {
 	conf->ctrlport = RTSP_DEF_CONTROL_PORT;
 	conf->ctrlproto = RTSP_DEF_CONTROL_PROTO;
 	conf->sendmousemotion = RTSP_DEF_SEND_MOUSE_MOTION;
-	//
 	conf->video_fps = RTSP_DEF_VIDEO_FPS;
 	conf->audio_bitrate = RTSP_DEF_AUDIO_BITRATE;
 	conf->audio_samplerate = RTSP_DEF_AUDIO_SAMPLERATE;
@@ -91,21 +88,16 @@ rtspconf_init(struct RTSPConf *conf) {
 	conf->audio_device_channel_layout = RTSP_DEF_AUDIO_DEVICE_CH_LAYOUT;
 	conf->audio_codec_format = RTSP_DEF_AUDIO_CODEC_FORMAT;
 	conf->audio_device_channel_layout = RTSP_DEF_AUDIO_CODEC_CH_LAYOUT;
-	//
 	//conf->vgo = new vector<string>;
-	conf->vso = new vector<string>;
-	//
+	conf->vso = new vector<string>;	
 	return 0;
 }
 
-static int
-rtspconf_load_codec(const char *key, const char *value,
-	const char **names, AVCodec **codec, AVCodec *(*finder)(const char **, enum AVCodecID)) {
-	//
+static int rtspconf_load_codec(const char *key, const char *value,
+	const char **names, AVCodec **codec, AVCodec *(*finder)(const char **, enum AVCodecID)) {	
 	int idx = 0;
 	char buf[1024], *saveptr;
 	const char *token;
-	//
 	strncpy(buf, value, sizeof(buf));
 	if((token = strtok_r(buf, DELIM, &saveptr)) == NULL) {
 		ga_error("# RTSP[config]: no codecs specified for %s.\n", key);
@@ -115,50 +107,40 @@ rtspconf_load_codec(const char *key, const char *value,
 		names[idx] = strdup(token);
 	} while(++idx<RTSPCONF_CODECNAME_SIZE && (token=strtok_r(NULL, DELIM, &saveptr))!=NULL);
 	names[idx] = NULL;
-	//
 	if((*codec = finder(names, AV_CODEC_ID_NONE)) == NULL) {
 		ga_error("# RTSP[config]: no available %s codecs (%s).\n", key, value);
 		return -1;
 	}
-	//
 	ga_error("# RTSP[config]: %s = %s (%s)\n", key, (*codec)->name,
 		(*codec)->long_name == NULL ? "N/A" : (*codec)->long_name);
 	return 0;
 }
 
-int
-rtspconf_parse(struct RTSPConf *conf) {
+int rtspconf_parse(struct RTSPConf *conf) {
 	char *ptr, buf[1024];
 	int v;
-	//
 	if(conf == NULL)
 		return -1;
-	//
+
 	rtspconf_init(conf);
-	//
 	if((ptr = ga_conf_readv("server-name", buf, sizeof(buf))) != NULL) {
 		conf->servername = strdup(ptr);
 	}
-	//
 	if((ptr = ga_conf_readv("base-object", buf, sizeof(buf))) != NULL) {
 		strncpy(conf->object, ptr, RTSPCONF_OBJECT_SIZE);
 	}
-	//
 	if((ptr = ga_conf_readv("title", buf, sizeof(buf))) != NULL) {
 		strncpy(conf->title, ptr, RTSPCONF_TITLE_SIZE);
 	}
-	//
 	if((ptr = ga_conf_readv("display", buf, sizeof(buf))) != NULL) {
 		strncpy(conf->display, ptr, RTSPCONF_DISPLAY_SIZE);
 	}
-	//
 	v = ga_conf_readint("server-port");
 	if(v <= 0 || v >= 65536) {
 		ga_error("# RTSP[config]: invalid server port %d\n", v);
 		return -1;
 	}
 	conf->serverport = v;
-	//
 	ptr = ga_conf_readv("proto", buf, sizeof(buf));
 	if(ptr == NULL || strcmp(ptr, "tcp") != 0) {
 		conf->proto = IPPROTO_UDP;
@@ -167,11 +149,8 @@ rtspconf_parse(struct RTSPConf *conf) {
 		conf->proto = IPPROTO_TCP;
 		ga_error("# RTSP[config]: using 'tcp' for RTP flows.\n");
 	}
-	//
-	conf->ctrlenable = ga_conf_readbool("control-enabled", 0);
-	//
+	conf->ctrlenable = ga_conf_readbool("control-enabled", 0);	
 	if(conf->ctrlenable != 0) {
-		//
 		v = ga_conf_readint("control-port");
 		if(v <= 0 || v >= 65536) {
 			ga_error("# RTSP[config]: invalid control port %d\n", v);
@@ -179,7 +158,6 @@ rtspconf_parse(struct RTSPConf *conf) {
 		}
 		conf->ctrlport = v;
 		ga_error("# RTSP[config]: controller port = %d\n", conf->ctrlport);
-		//
 		ptr = ga_conf_readv("control-proto", buf, sizeof(buf));
 		if(ptr == NULL || strcmp(ptr, "tcp") != 0) {
 			conf->ctrlproto = IPPROTO_UDP;
@@ -188,7 +166,6 @@ rtspconf_parse(struct RTSPConf *conf) {
 			conf->ctrlproto = IPPROTO_TCP;
 			ga_error("# RTSP[config]: controller via 'tcp' protocol.\n");
 		}
-		//
 		conf->sendmousemotion  = ga_conf_readbool("control-send-mouse-motion", 1);
 	}
 	// video-encoder, audio-encoder, video-decoder, and audio-decoder
@@ -224,42 +201,37 @@ rtspconf_parse(struct RTSPConf *conf) {
 			return -1;
 	}
 #endif
-	//
 	v = ga_conf_readint("video-fps");
 	if(v <= 0 || v > 120) {
 		ga_error("# RTSP[conf]: video-fps out-of-range %d (valid: 1-120)\n", v);
 		return -1;
 	}
 	conf->video_fps = v;
-	//
 	ptr = ga_conf_readv("video-renderer", buf, sizeof(buf));
 	if(ptr != NULL && strcmp(ptr, "software")==0) {
 		conf->video_renderer_software = 1;
 	} else {
 		conf->video_renderer_software = 0;
 	}
-	//
+	
 	v = ga_conf_readint("audio-bitrate");
 	if(v <= 0 || v > 1024000) {
 		ga_error("# RTSP[config]: audio-bitrate out-of-range %d (valid: 1-1024000)\n", v);
 		return -1;
 	}
 	conf->audio_bitrate = v;
-	//
 	v = ga_conf_readint("audio-samplerate");
 	if(v <= 0 || v > 1024000) {
 		ga_error("# RTSP[config]: audio-samplerate out-of-range %d (valid: 1-1024000)\n", v);
 		return -1;
 	}
 	conf->audio_samplerate = v;
-	//
 	v = ga_conf_readint("audio-channels");
 	if(v < 1) {
 		ga_error("# RTSP[config]: audio-channels must be greater than zero (%d).\n", v);
 		return -1;
 	}
 	conf->audio_channels = v;
-	//
 	if((ptr = ga_conf_readv("audio-device-format", buf, sizeof(buf))) == NULL) {
 		ga_error("# RTSP[config]: no audio device format specified.\n");
 		return -1;
@@ -268,7 +240,6 @@ rtspconf_parse(struct RTSPConf *conf) {
 		ga_error("# RTSP[config]: unsupported audio device format '%s'\n", ptr);
 		return -1;
 	}
-	//
 	if((ptr = ga_conf_readv("audio-device-channel-layout", buf, sizeof(buf))) == NULL) {
 		ga_error("# RTSP[config]: no audio device channel layout specified.\n");
 		return -1;
@@ -277,7 +248,6 @@ rtspconf_parse(struct RTSPConf *conf) {
 		ga_error("# RTSP[config]: unsupported audio device channel layout '%s'\n", ptr);
 		return -1;
 	}
-	//
 	if((ptr = ga_conf_readv("audio-codec-format", buf, sizeof(buf))) == NULL) {
 		ga_error("# RTSP[config]: no audio codec format specified.\n");
 		return -1;
@@ -286,7 +256,6 @@ rtspconf_parse(struct RTSPConf *conf) {
 		ga_error("# RTSP[config]: unsupported audio codec format '%s'\n", ptr);
 		return -1;
 	}
-	//
 	if((ptr = ga_conf_readv("audio-codec-channel-layout", buf, sizeof(buf))) == NULL) {
 		ga_error("# RTSP[config]: no audio codec channel layout specified.\n");
 		return -1;
@@ -296,13 +265,11 @@ rtspconf_parse(struct RTSPConf *conf) {
 		return -1;
 	}
 	// LAST: video-specific parameters
-	if(ga_conf_mapsize("video-specific") > 0) {
-		//
+	if(ga_conf_mapsize("video-specific") > 0) {	
 		ga_conf_mapreset("video-specific");
 		for(	ptr = ga_conf_mapkey("video-specific", buf, sizeof(buf));
 			ptr != NULL;
 			ptr = ga_conf_mapnextkey("video-specific", buf, sizeof(buf))) {
-			//
 			char *val, valbuf[1024];
 			val = ga_conf_mapvalue("video-specific", valbuf, sizeof(valbuf));
 			if(val == NULL || *val == '\0')
@@ -316,8 +283,7 @@ rtspconf_parse(struct RTSPConf *conf) {
 	return 0;
 }
 
-void
-rtspconf_resolve_server(struct RTSPConf *conf, const char *servername) {
+void rtspconf_resolve_server(struct RTSPConf *conf, const char *servername) {
 	struct in_addr addr;
 	struct hostent *hostEnt;
 	if((addr.s_addr = inet_addr(servername)) == INADDR_NONE) {

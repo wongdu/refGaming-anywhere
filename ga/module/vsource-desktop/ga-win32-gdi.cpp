@@ -32,8 +32,7 @@ static HDC		hDesktopCompatibleDC;
 static HBITMAP		hDesktopCompatibleBitmap;
 static LPVOID		pBits;
 
-int
-ga_win32_GDI_init(struct gaImage *image) {
+int ga_win32_GDI_init(struct gaImage *image) {
 	ga_win32_fill_bitmap_info(
 		&bmpInfo,
 		GetSystemMetrics(SM_CXSCREEN),
@@ -43,28 +42,23 @@ ga_win32_GDI_init(struct gaImage *image) {
 	ZeroMemory(&screenRect, sizeof(screenRect));
 	screenRect.right = bmpInfo.bmiHeader.biWidth-1;
 	screenRect.bottom = bmpInfo.bmiHeader.biHeight-1;
-	//
 	image->width = bmpInfo.bmiHeader.biWidth;
 	image->height = bmpInfo.bmiHeader.biHeight;
 	image->bytes_per_line = (BITSPERPIXEL>>3) * image->width;
-	//
+
 	hDesktopWnd = GetDesktopWindow();
 	hDesktopDC = GetDC(hDesktopWnd);
 	hDesktopCompatibleDC = CreateCompatibleDC(hDesktopDC);
 	hDesktopCompatibleBitmap = CreateDIBSection(hDesktopDC ,&bmpInfo, DIB_RGB_COLORS, &pBits, NULL,0);
-	//
 	if(hDesktopCompatibleDC==NULL || hDesktopCompatibleBitmap == NULL) {
 		ga_error("Unable to Create Desktop Compatible DC/Bitmap\n");
 		return -1;
 	}
-	//
 	SelectObject(hDesktopCompatibleDC, hDesktopCompatibleBitmap);
-	//
 	return 0;
 }
 
-void
-ga_win32_GDI_deinit() {
+void ga_win32_GDI_deinit() {
 	if(hDesktopCompatibleBitmap != NULL) {
 		DeleteObject(hDesktopCompatibleBitmap);
 		hDesktopCompatibleBitmap = NULL;
@@ -81,8 +75,7 @@ ga_win32_GDI_deinit() {
 	return;
 }
 
-int
-ga_win32_GDI_capture(char *buf, int buflen, struct gaRect *grect) {
+int ga_win32_GDI_capture(char *buf, int buflen, struct gaRect *grect) {
 	int linesize, height;
 	char *source, *dest;
 	if(grect==NULL && buflen < frameSize)
@@ -97,7 +90,6 @@ ga_win32_GDI_capture(char *buf, int buflen, struct gaRect *grect) {
 
 	// XXX: images are stored upside-down
 	linesize = (BITSPERPIXEL>>3) * (screenRect.right+1);
-	//
 	if(grect == NULL) {
 		source = ((char*) pBits) + (linesize * screenRect.bottom);
 		dest = buf;
@@ -122,4 +114,3 @@ ga_win32_GDI_capture(char *buf, int buflen, struct gaRect *grect) {
 
 	return grect==NULL ? frameSize : grect->size;
 }
-

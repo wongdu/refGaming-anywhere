@@ -85,9 +85,7 @@ vsource_frame_init(int channel, vsource_frame_t *frame) {
 	// has not been initialized?
 	if(vs->max_width == 0)
 		return NULL;
-	//
 	bzero(frame, sizeof(vsource_frame_t));
-	//
 	for(i = 0; i < VIDEO_SOURCE_MAX_STRIDE; i++) {
 		frame->linesize[i] = vs->max_stride;
 	}
@@ -106,8 +104,7 @@ vsource_frame_init(int channel, vsource_frame_t *frame) {
  *
  * Currently it does nothing because memory allocation is done in pipeline.
  */
-void
-vsource_frame_release(vsource_frame_t *frame) {
+void vsource_frame_release(vsource_frame_t *frame) {
 	return;
 }
 
@@ -117,8 +114,7 @@ vsource_frame_release(vsource_frame_t *frame) {
  * @param src [in] Pointer to a source video frame.
  * @param dst [in] Pointer to an initialized destination video frame.
  */
-void
-vsource_dup_frame(vsource_frame_t *src, vsource_frame_t *dst) {
+void vsource_dup_frame(vsource_frame_t *src, vsource_frame_t *dst) {
 	int j;
 	dst->imgpts = src->imgpts;
 	dst->pixelformat = src->pixelformat;
@@ -135,7 +131,7 @@ vsource_dup_frame(vsource_frame_t *src, vsource_frame_t *dst) {
 
 /**
  * Color code colors based on RGBA color.
- * The order is: blak blue green, red, yellow, magenta, cyan, and white */
+ * The order is: black blue green, red, yellow, magenta, cyan, and white */
 static unsigned char rgbacolor[8][4] =
 	{ {   0,   0,   0, 255 },
 	  {   0,   0, 234, 255 },
@@ -148,7 +144,7 @@ static unsigned char rgbacolor[8][4] =
 
 /**
  * Color code colors based on BGRA color.
- * The order is: blak blue green, red, yellow, magenta, cyan, and white */
+ * The order is: black blue green, red, yellow, magenta, cyan, and white */
 static unsigned char bgracolor[8][4] =
 	{ {   0,   0,   0, 255 },
 	  { 234,   0,   0, 255 },
@@ -161,7 +157,7 @@ static unsigned char bgracolor[8][4] =
 
 /**
  * Color code colors based on YUV420P color.
- * The order is: blak blue green, red, yellow, magenta, cyan, and white */
+ * The order is: black blue green, red, yellow, magenta, cyan, and white */
 static unsigned char yuv_colorY[8] =	/**< For YUV plane Y' */
 	//{ 0x10, 0x26, 0x81, 0x4a, 0xBA, 0x5F, 0x97, 0xEB }; // - 224
 	{ 0x10, 0x27, 0x86, 0x4C, 0xC2, 0x63, 0x9D, 0xEB }; // - 234
@@ -172,7 +168,7 @@ static unsigned char yuv_colorV[8] =	/**< For YUV plane V */
 	//{ 0x7A, 0x77, 0x3B, 0xD8, 0x80, 0xCD, 0x26, 0x86 }; // - 224
 	{ 0x79, 0x77, 0x38, 0xDC, 0x80, 0xD1, 0x22, 0x87 }; // - 234
 
-// global configuratoin for embedding color code feature (CC)
+// global configuration for embedding color code feature (CC)
 static int vsource_colorcode_initialized = 0;			/**< CC has been initialized */
 static unsigned int vsource_colorcode_counter = 0;		/**< CC's current sequence number */
 static unsigned int vsource_colorcode_counter_mask = 0;		/**< CC's mask used to rotate sequence number */
@@ -185,7 +181,7 @@ static unsigned int vsource_colorcode_initshift = 0;		/**< CC's shift value to c
 static unsigned char * vsource_colorcode_planes[4];		/**< CC's color code planes */
 static unsigned char vsource_colorcode_buffer[4 * COLORCODE_MAX_WIDTH * (COLORCODE_MAX_DIGIT + COLORCODE_SUFFIX)];	/**<
 								 * rendered color code buffer */
-//
+
 static FILE *savefp_ccodets = NULL;				/**< FILE pointer used to store color code sequence and timestamp */
 
 /**
@@ -195,8 +191,7 @@ static FILE *savefp_ccodets = NULL;				/**< FILE pointer used to store color cod
  *	Values can be zero (YUV) or non-zero (RGB).
  * @return 0 on success, or -1 on error.
  */
-int
-vsource_embed_colorcode_init(int RGBmode) {
+int vsource_embed_colorcode_init(int RGBmode) {
 	int i, param[3];
 	char savefile_ccodets[128];
 	// read param
@@ -214,7 +209,7 @@ vsource_embed_colorcode_init(int RGBmode) {
 		vsource_colorcode_digits = COLORCODE_MAX_DIGIT;
 	if(vsource_colorcode_width > COLORCODE_MAX_WIDTH)
 		vsource_colorcode_width = COLORCODE_MAX_WIDTH;
-	//
+
 	vsource_colorcode_initshift = (vsource_colorcode_digits - 1) * 3;
 	vsource_colorcode_initmask = (0x07 << vsource_colorcode_initshift);
 	vsource_colorcode_total_width =
@@ -224,7 +219,7 @@ vsource_embed_colorcode_init(int RGBmode) {
 		vsource_colorcode_counter_mask <<= 3;
 		vsource_colorcode_counter_mask |= 0x07;
 	}
-	//
+	
 	ga_error("video source: color code initialized - %dx%d, %d digits, shift=%d, initmask=%08x, totalwidth=%d, counter-mask=%08x\n",
 		vsource_colorcode_width, vsource_colorcode_height,
 		vsource_colorcode_digits,
@@ -240,7 +235,6 @@ vsource_embed_colorcode_init(int RGBmode) {
 		vsource_colorcode_planes[2] = vsource_colorcode_planes[1] + (vsource_colorcode_total_width>>2);
 		vsource_colorcode_planes[3] = NULL;
 	}
-	//
 	vsource_colorcode_initialized = 1;
 	return 0;
 }
@@ -248,8 +242,7 @@ vsource_embed_colorcode_init(int RGBmode) {
 /**
  * Reset the color code sequence number (counter).
  */
-void
-vsource_embed_colorcode_reset() {
+void vsource_embed_colorcode_reset() {
 	vsource_colorcode_counter = 0;
 	return;
 }
@@ -261,8 +254,7 @@ vsource_embed_colorcode_reset() {
  * @param length [in] The lenght of the data
  * @return the CRC5-USB value
  */
-static crc5_t
-vsource_crc5_usb(unsigned char *data, int length) {
+static crc5_t vsource_crc5_usb(unsigned char *data, int length) {
 	crc5_t crc;
 	crc = crc5_init();
 	crc = crc5_update_usb(crc, data, length);
@@ -277,8 +269,7 @@ vsource_crc5_usb(unsigned char *data, int length) {
  * @param length [in] The lenght of the data
  * @return the CRC5-CCITT value
  */
-static crc5_t
-vsource_crc5_ccitt(unsigned char *data, int length) {
+static crc5_t vsource_crc5_ccitt(unsigned char *data, int length) {
 	crc5_t crc;
 	crc = crc5_init();
 	crc = crc5_update_ccitt(crc, data, length);
@@ -293,8 +284,7 @@ vsource_crc5_ccitt(unsigned char *data, int length) {
  * @param value [in] The value to be embedded.
  *	The value contains only the sequence number part.
  */
-static void
-vsource_embed_yuv_code(vsource_frame_t *frame, unsigned int value) {
+static void vsource_embed_yuv_code(vsource_frame_t *frame, unsigned int value) {
 	int i, j, width, height;
 	/* CRC * 2 + ID * 2 */
 	unsigned char suffix[COLORCODE_SUFFIX] = {0, 0, 3, 7};
@@ -371,7 +361,7 @@ vsource_embed_yuv_code(vsource_frame_t *frame, unsigned int value) {
 		dstU += frame->linesize[1];
 		dstV += frame->linesize[2];
 	}
-	//
+
 	return;
 }
 
@@ -382,8 +372,7 @@ vsource_embed_yuv_code(vsource_frame_t *frame, unsigned int value) {
  * @param value [in] The value to be embedded.
  *	The value contains only the sequence number part.
  */
-static void
-vsource_embed_rgba_code(vsource_frame_t *frame, unsigned int value, unsigned char color[8][4]) {
+static void vsource_embed_rgba_code(vsource_frame_t *frame, unsigned int value, unsigned char color[8][4]) {
 	int i, j, height;
 	/* CRC * 2 + ID * 2 */
 	unsigned char suffix[COLORCODE_SUFFIX] = {0, 0, 3, 7};
@@ -435,12 +424,10 @@ vsource_embed_rgba_code(vsource_frame_t *frame, unsigned int value, unsigned cha
 	height = frame->realheight < vsource_colorcode_height ?
 			frame->realheight : vsource_colorcode_height;
 	dst = frame->imgbuf;
-	//
 	for(i = 0; i < height; i++) {
 		bcopy(vsource_colorcode_buffer, dst, vsource_colorcode_total_width * 4);
 		dst += frame->linesize[0];
 	}
-	//
 	return;
 }
 
@@ -454,8 +441,7 @@ vsource_embed_rgba_code(vsource_frame_t *frame, unsigned int value, unsigned cha
  * embed a sequence number, increase the sequence number by 1, and
  * rotate the sequence number when it reaches the bounday.
  */
-void
-vsource_embed_colorcode_inc(vsource_frame_t *frame) {
+void vsource_embed_colorcode_inc(vsource_frame_t *frame) {
 	vsource_embed_colorcode(frame, vsource_colorcode_counter);
 	vsource_colorcode_counter++;
 	vsource_colorcode_counter &= vsource_colorcode_counter_mask;
@@ -468,8 +454,7 @@ vsource_embed_colorcode_inc(vsource_frame_t *frame) {
  * @param frame [in] Pointer to the video frame.
  * @param value [in] The sequence number to be embedded.
  */
-void
-vsource_embed_colorcode(vsource_frame_t *frame, unsigned int value) {
+void vsource_embed_colorcode(vsource_frame_t *frame, unsigned int value) {
 	if(vsource_colorcode_initialized == 0)
 		return;
 	if(frame == NULL)
@@ -491,8 +476,7 @@ vsource_embed_colorcode(vsource_frame_t *frame, unsigned int value) {
  *
  * @return The total number of channels.
  */
-int
-video_source_channels() {
+int video_source_channels() {
 	return gChannels;
 }
 
@@ -502,8 +486,7 @@ video_source_channels() {
  * @param channel [in] The channel Id.
  * @return Pointer to the obtained video source info data structure.
  */
-vsource_t *
-video_source(int channel) {
+vsource_t * video_source(int channel) {
 	if(channel < 0 || channel > gChannels) {
 		return NULL;
 	}
@@ -517,8 +500,7 @@ video_source(int channel) {
  * @param pipename [in] The pipeline name to be added.
  * @return Pointer to the added pipeline name.
  */
-static const char *
-video_source_add_pipename_internal(vsource_t *vs, const char *pipename) {
+static const char * video_source_add_pipename_internal(vsource_t *vs, const char *pipename) {
 	pipename_t *p;
 	if(vs == NULL || pipename == NULL)
 		return NULL;
@@ -537,8 +519,7 @@ video_source_add_pipename_internal(vsource_t *vs, const char *pipename) {
  * @param pipename [in] The pipeline name to be added.
  * @return Pointer to the added pipeline name.
  */
-const char *
-video_source_add_pipename(int channel, const char *pipename) {
+const char * video_source_add_pipename(int channel, const char *pipename) {
 	vsource_t *vs = video_source(channel);
 	if(vs == NULL)
 		return NULL;
@@ -551,8 +532,7 @@ video_source_add_pipename(int channel, const char *pipename) {
  * @param channel [in] The channel id of the video source.
  * @return Pointer to the pipeline name.
  */
-const char *
-video_source_get_pipename(int channel) {
+const char * video_source_get_pipename(int channel) {
 	vsource_t *vs = video_source(channel);
 	if(vs == NULL)
 		return NULL;
@@ -567,8 +547,7 @@ video_source_get_pipename(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The maximum width of the video source, or -1 on error.
  */
-int
-video_source_max_width(int channel) {
+int video_source_max_width(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->max_width;
 }
@@ -579,8 +558,7 @@ video_source_max_width(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The maximum height of the video source, or -1 on error.
  */
-int
-video_source_max_height(int channel) {
+int video_source_max_height(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->max_height;
 }
@@ -591,8 +569,7 @@ video_source_max_height(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The maximum stride of the video source, or -1 on error.
  */
-int
-video_source_max_stride(int channel) {
+int video_source_max_stride(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->max_stride;
 }
@@ -603,8 +580,7 @@ video_source_max_stride(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The current width of the video source, or -1 on error.
  */
-int
-video_source_curr_width(int channel) {
+int video_source_curr_width(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->curr_width;
 }
@@ -615,8 +591,7 @@ video_source_curr_width(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The current height of the video source, or -1 on error.
  */
-int
-video_source_curr_height(int channel) {
+int video_source_curr_height(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->curr_height;
 }
@@ -627,8 +602,7 @@ video_source_curr_height(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The current stride of the video source, or -1 on error.
  */
-int
-video_source_curr_stride(int channel) {
+int video_source_curr_stride(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->curr_stride;
 }
@@ -639,8 +613,7 @@ video_source_curr_stride(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The output width of the video source, or -1 on error.
  */
-int
-video_source_out_width(int channel) {
+int video_source_out_width(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->out_width;
 }
@@ -651,8 +624,7 @@ video_source_out_width(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The output height of the video source, or -1 on error.
  */
-int
-video_source_out_height(int channel) {
+int video_source_out_height(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->out_height;
 }
@@ -663,8 +635,7 @@ video_source_out_height(int channel) {
  * @param channel [in] The channel id of the video source.
  * @return The output stride of the video source, or -1 on error.
  */
-int
-video_source_out_stride(int channel) {
+int video_source_out_stride(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? -1 : vs->out_stride;
 }
@@ -675,8 +646,7 @@ video_source_out_stride(int channel) {
   * @param channel [in] The channel id
   * @return The size in bytes, or 0 if the given \a channel is not initialized
   */
-int
-video_source_mem_size(int channel) {
+int video_source_mem_size(int channel) {
 	vsource_t *vs = video_source(channel);
 	return vs == NULL ? 0 : (vs->max_height * vs->max_stride + VSOURCE_ALIGNMENT);
 }
@@ -700,25 +670,21 @@ video_source_mem_size(int channel) {
  *   each video configuration.
  * - The corresponding video pipeline is created as well.
  */
-int
-video_source_setup_ex(vsource_config_t *config, int nConfig) {
+int video_source_setup_ex(vsource_config_t *config, int nConfig) {
 	int idx;
 	int maxres[2] = { 0, 0 };
 	int outres[2] = { 0, 0 };
-	//
 	if(config==NULL || nConfig <=0 || nConfig > VIDEO_SOURCE_CHANNEL_MAX) {
 		ga_error("video source: invalid video source configuration request=%d; MAX=%d; config=%p\n",
 			nConfig, VIDEO_SOURCE_CHANNEL_MAX, config);
 		return -1;
 	}
-	//
 	if(ga_conf_readints("max-resolution", maxres, 2) != 2) {
 		maxres[0] = maxres[1] = 0;
 	}
 	if(ga_conf_readints("output-resolution", outres, 2) != 2) {
 		outres[0] = outres[1] = 0;
 	}
-	//
 	for(idx = 0; idx < nConfig; idx++) {
 		vsource_t *vs = &gVsource[idx];
 		dpipe_buffer_t *data = NULL;
@@ -777,8 +743,7 @@ video_source_setup_ex(vsource_config_t *config, int nConfig) {
  *
  * This function calls the \em video_source_setup_ex function.
  */
-int
-video_source_setup(int curr_width, int curr_height, int curr_stride) {
+int video_source_setup(int curr_width, int curr_height, int curr_stride) {
 	vsource_config_t c;
 	bzero(&c, sizeof(c));
 	//config.rtp_id = channel_id;
@@ -787,4 +752,3 @@ video_source_setup(int curr_width, int curr_height, int curr_stride) {
 	c.curr_stride = curr_stride;	
 	return video_source_setup_ex(&c, 1);
 }
-

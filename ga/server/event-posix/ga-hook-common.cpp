@@ -189,17 +189,14 @@ load_modules() {
 	if((m_vencoder = ga_load_module(module_path, "vencoder_")) == NULL)
 		return -1;
 	if(ga_conf_readbool("enable-audio", 1) != 0) {
-	//////////////////////////
 #ifndef __APPLE__
 	if(ga_conf_readv("hook-audio", hook_audio, sizeof(hook_audio)) == NULL
 	|| hook_audio[0] == '\0') {
-	//////////////////////////
 	snprintf(module_path, sizeof(module_path),
 		BACKSLASHDIR("%s/mod/asource-system", "%smod\\asource-system"),
 		ga_root);
 	if((m_asource = ga_load_module(module_path, "asource_")) == NULL)
 		return -1;
-	//////////////////////////
 	}
 #endif
 	snprintf(module_path, sizeof(module_path),
@@ -207,7 +204,6 @@ load_modules() {
 		ga_root);
 	if((m_aencoder = ga_load_module(module_path, "aencoder_")) == NULL)
 		return -1;
-	//////////////////////////
 	}
 	if(no_default_controller == 0) {
 	snprintf(module_path, sizeof(module_path),
@@ -216,22 +212,18 @@ load_modules() {
 	if((m_ctrl = ga_load_module(module_path, "sdlmsg_replay_")) == NULL)
 		return -1;
 	}
-	//////////////////////////
 	snprintf(module_path, sizeof(module_path),
 		BACKSLASHDIR("%s/mod/server-live555", "%smod\\server-live555"),
 		ga_root);
 	if((m_server = ga_load_module(module_path, "live555_")) == NULL)
 		return -1;
-	//////////////////////////
 	return 0;
 }
 
-int
-init_modules() {
+int init_modules() {
 	struct RTSPConf *conf = rtspconf_global();
 	static const char *filterpipe[] =  { imagepipe0, filterpipe0 };
 	char hook_audio[64] = "";
-	//
 	if(conf->ctrlenable && no_default_controller==0) {
 		if(ga_init_single_module("controller", m_ctrl, (void*) prect) < 0) {
 			ga_error("******** Init controller module failed, controller disabled.\n");
@@ -241,10 +233,8 @@ init_modules() {
 	}
 	// controller server is built-in - no need to init
 	ga_init_single_module_or_quit("filter", m_filter, (void*) filter_param);
-	//
 	ga_init_single_module_or_quit("video-encoder", m_vencoder, filterpipefmt);
 	if(ga_conf_readbool("enable-audio", 1) != 0) {
-	//////////////////////////
 #ifndef __APPLE__
 	if(ga_conf_readv("hook-audio", hook_audio, sizeof(hook_audio)) == NULL
 	|| hook_audio[0] == '\0') {
@@ -252,14 +242,12 @@ init_modules() {
 	}
 #endif
 	ga_init_single_module_or_quit("audio-encoder", m_aencoder, NULL);
-	//////////////////////////
 	}
 	ga_init_single_module_or_quit("rtsp-server", m_server, NULL);
 	return 0;
 }
 
-int
-run_modules() {
+int run_modules() {
 	struct RTSPConf *conf = rtspconf_global();
 	static const char *filterpipe[] =  { imagepipe0, filterpipe0 };
 	char hook_audio[64] = "";
@@ -277,7 +265,6 @@ run_modules() {
 	encoder_register_vencoder(m_vencoder, video_encoder_param);
 	// audio
 	if(ga_conf_readbool("enable-audio", 1) != 0) {
-	//////////////////////////
 #ifndef __APPLE__
 	if(ga_conf_readv("hook-audio", hook_audio, sizeof(hook_audio)) == NULL
 	|| hook_audio[0] == '\0') {
@@ -286,30 +273,22 @@ run_modules() {
 	}
 #endif
 	encoder_register_aencoder(m_aencoder, audio_encoder_param);
-	//////////////////////////
 	}
 	// server
 	if(m_server->start(NULL) < 0)	exit(-1);
-	//
 	return 0;
 }
 
-void *
-ga_server(void *arg) {
-	//
+void * ga_server(void *arg) {
 	do {
 		usleep(100000);
 	} while(resolution_retrieved == 0);
-	//
 	ga_error("[ga_server] load modules and run the server\n");
-	//
 	if(vsource_init(encoder_width, encoder_height) < 0) {
 		ga_error("[ga_server] video source init failed.\n");
 		return NULL;
 	}
-	//
 	prect = NULL;
-	//
 	if(ga_crop_window(&rect, &prect) < 0) {
 		return NULL;
 	} else if(prect == NULL) {
@@ -322,24 +301,18 @@ ga_server(void *arg) {
 	// load server modules
 	if(load_modules() < 0)	 { return NULL; }
 	if(init_modules() < 0)	 { return NULL; }
-	if(run_modules() < 0)	 { return NULL; }
-	//
+	if(run_modules() < 0)	 { return NULL; }	
 	//rtspserver_main(NULL);
 	//liveserver_main(NULL);
 	while(1) {
 		usleep(5000000);
 	}
-	//
 	ga_deinit();
-	//
 	return NULL;
 }
 
-int
-ga_hook_get_resolution(int width, int height) {
-	//
+int ga_hook_get_resolution(int width, int height) {
 	int resolution[2];
-	//
 	if(game_width <= 0 || game_height <= 0) {
 		game_width = width;
 		game_height = height;
@@ -351,12 +324,11 @@ ga_hook_get_resolution(int width, int height) {
 			encoder_width = (game_width / ENCODING_MOD_BASE) * ENCODING_MOD_BASE;
 			encoder_height = (game_height / ENCODING_MOD_BASE) * ENCODING_MOD_BASE;
 		}
-		//
+		
 		ga_error("detected resolution: game %dx%d; encoder %dx%d\n",
 			game_width, game_height, encoder_width, encoder_height);
 		return 0;
 	}
-	//
 	if(width == game_width && height == game_height) {
 		if(ga_conf_readints("max-resolution", resolution, 2) == 2) {
 			encoder_width = resolution[0];
@@ -371,13 +343,11 @@ ga_hook_get_resolution(int width, int height) {
 	} else {
 		ga_error("resolution not fitted (%dx%d)\n", width, height);
 	}
-	//
 	return -1;
 }
 
 // token bucket rate controller
-int
-ga_hook_video_rate_control() {
+int ga_hook_video_rate_control() {
 	static int initialized = 0;
 	static int max_tokens;
 	static long long tokens = 0LL;
@@ -407,7 +377,6 @@ ga_hook_video_rate_control() {
 		initialized = 1;
 		return -1;
 	}
-	//
 #ifdef WIN32
 	QueryPerformanceCounter(&currCounter);
 	delta = pcdiff_us(currCounter, lastCounter, freq);
@@ -429,8 +398,7 @@ ga_hook_video_rate_control() {
 	return -1;
 }
 
-int
-ga_hook_init() {
+int ga_hook_init() {
 	char *ptr, hook_method[64];
 	int resolution[2], out_resolution[2];
 	char *confpath;
@@ -438,7 +406,6 @@ ga_hook_init() {
 	extern char g_root[1024];
 	extern char g_confpath[1024];
 	extern char g_appexe[1024];
-	//
 	confpath = g_confpath;
 	ga_root = strdup(g_root);
 #else*/
@@ -447,18 +414,15 @@ ga_hook_init() {
 		return -1;
 	}
 	ga_root = strdup(confpath);
-	//
 	if((confpath = getenv("GA_CONFIG")) == NULL) {
 		ga_error("GA_CONFIG not set.\n");
 		return -1;
 	}
-//#endif
-	//
+//#endif	
 	if(ga_init(confpath, NULL) < 0)
 		return -1;
-	//
+	
 	ga_openlog();
-	//
 	if(rtspconf_parse(rtspconf_global()) < 0)
 		return -1;
 	// handle ga-hook specific configurations
@@ -478,21 +442,17 @@ ga_hook_init() {
 		ctrl_server_set_resolution(game_width, game_height);
 		ctrl_server_set_output_resolution(game_width, game_height);
 	}
-	//
 	if(ga_conf_readints("output-resolution", out_resolution, 2) == 2) {
 		ga_error("*** output resolution = %dx%d\n",
 				out_resolution[0], out_resolution[1]);
 		ctrl_server_set_output_resolution(out_resolution[0], out_resolution[1]);
 	}
-	//
 	enable_server_rate_control = ga_conf_readbool("enable-server-rate-control", 0);
 	server_token_fill_interval = ga_conf_readint("server-token-fill-interval");
 	server_num_token_to_fill = ga_conf_readint("server-num-token-to-fill");
 	server_max_tokens = ga_conf_readint("server-max-tokens");
-	video_fps = ga_conf_readint("video-fps");
-	//
+	video_fps = ga_conf_readint("video-fps");	
 	// XXX: check for valid configurations
-	//
 	return 0;
 }
 
@@ -517,35 +477,27 @@ ga_hook_lookup_or_quit(void *handle, const char *name) {
 #ifdef WIN32
 static map<string, TRACED_HOOK_HANDLE> hookdb;
 
-void
-ga_hook_function(const char *id, void *oldfunc, void *newfunc) {
+void ga_hook_function(const char *id, void *oldfunc, void *newfunc) {
 	unsigned long thread_ids[] = { GA_HOOK_INVALID_THREADID };
 	TRACED_HOOK_HANDLE h = NULL;
-	//
 	if(hookdb.find(id) != hookdb.end()) {
 		ga_error("[ga-hook] %s already hooked? please check.\n", id);
 		return;
 	}
-	//
 	if((h = (TRACED_HOOK_HANDLE) malloc(sizeof(HOOK_TRACE_INFO))) == NULL) {
 		ga_error("[ga-hook] alloc HOOK_TRACE_INFO failed.\n");
 		exit(-1);
 	}
 	memset(h, 0, sizeof(HOOK_TRACE_INFO));
-	//
 	if(LhInstallHook(oldfunc, newfunc, NULL, h) != 0) {
 		ga_error("[ga-hook] hook for function %s failed.\n", id);
 		exit(-1);
 	}
-	//
 	if(LhSetExclusiveACL(thread_ids, 1, h) != 0) {
 		ga_error("[ga-hook] cannot activate hook (%s)\n", id);
 		exit(-1);
 	}
-	//
 	hookdb[id] = h;
-	//
 	return;
 }
 #endif	/* WIN32 */
-
