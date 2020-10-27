@@ -106,9 +106,12 @@ static int filter_RGB2YUV_init(void *arg) {
 					inputW, inputH, AV_PIX_FMT_RGBA,
 					outputW, outputH, AV_PIX_FMT_YUV420P);
 #else
-			swsctx = create_frame_converter(
+			/*swsctx = create_frame_converter(
 					inputW, inputH, AV_PIX_FMT_BGRA,
-					outputW, outputH, AV_PIX_FMT_YUV420P);
+					outputW, outputH, AV_PIX_FMT_YUV420P);*/
+			swsctx = create_frame_converter(
+				inputW, inputH, AV_PIX_FMT_RGBA,
+				outputW, outputH, AV_PIX_FMT_YUV420P);
 #endif
 		}
 		if(swsctx == NULL) {

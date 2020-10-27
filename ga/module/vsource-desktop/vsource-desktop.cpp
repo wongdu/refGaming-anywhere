@@ -243,7 +243,8 @@ static void * vsource_threadproc(void *arg) {
 #ifdef __APPLE__
 		frame->pixelformat = AV_PIX_FMT_RGBA;
 #else
-		frame->pixelformat = AV_PIX_FMT_BGRA;
+		//frame->pixelformat = AV_PIX_FMT_BGRA;
+		frame->pixelformat = AV_PIX_FMT_RGBA;
 #endif
 		if(prect == NULL) {
 			frame->realwidth = screenwidth;
@@ -303,6 +304,16 @@ static void * vsource_threadproc(void *arg) {
 #else // X11
 		ga_xwin_capture((char*) frame->imgbuf, frame->imgbufsize, prect);
 #endif
+		
+		// draw cursor
+#ifdef WIN32
+		ga_win32_draw_system_cursor(frame);	
+		for (int idx = 0; idx < frame->imgbufsize;idx+=4){
+			unsigned char temp = frame->imgbuf[idx];
+			frame->imgbuf[idx] = frame->imgbuf[idx+2];
+			frame->imgbuf[idx + 2] = temp;
+		}
+#endif
 		saveNum++;
 		if (saveNum == 100){
 			//CImg<unsigned char> colormap(frame->imgbuf, frame->realwidth, frame->realheight, 1, 3, false);
@@ -320,10 +331,7 @@ static void * vsource_threadproc(void *arg) {
 			//colormap.permute_axes("cxyz");
 			colormap.save("frame.jpg");
 		}
-		// draw cursor
-#ifdef WIN32
-		ga_win32_draw_system_cursor(frame);			
-#endif
+
 		//gImgPts++;
 		frame->imgpts = tvdiff_us(&captureTv, &initialTv)/frame_interval;
 		frame->timestamp = captureTv;
