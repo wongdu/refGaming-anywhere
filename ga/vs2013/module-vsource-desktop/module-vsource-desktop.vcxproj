@@ -138,6 +138,7 @@
     <ClCompile Include="..\..\module\vsource-desktop\vsource-desktop.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\module\vsource-desktop\CImg.h" />
     <ClInclude Include="..\..\module\vsource-desktop\ga-win32-common.h" />
     <ClInclude Include="..\..\module\vsource-desktop\ga-win32-gdi.h" />
   </ItemGroup>

@@ -32,5 +32,8 @@
     <ClInclude Include="..\..\module\vsource-desktop\ga-win32-common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\CImg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
