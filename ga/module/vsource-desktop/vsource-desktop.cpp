@@ -376,7 +376,7 @@ static void * vsource_threadproc(void *arg) {
 			mih.queryAll(currPdqhash, distanceThreshold, matches);
 			for (auto itm : matches){
 				ga_log("current hash is: \"%s\",distance is: %d \n", currPdqhash.format().c_str(), itm.first.hammingDistance(currPdqhash));
-				if (itm.first.hammingDistance(currPdqhash)<45){
+				if (itm.first.hammingDistance(currPdqhash)<40){
 					std::string strFileName = "";
 					saveNum++;
 					char timebuf[32];
@@ -389,7 +389,7 @@ static void * vsource_threadproc(void *arg) {
 					strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash));	
 					strFileName += ".jpg";
 					//colormap.save(strFileName.c_str());
-					CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
+					//CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
 				}
 			}
 			/*if (matches.size() > 0){

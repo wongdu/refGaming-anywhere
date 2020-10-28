@@ -74,7 +74,7 @@ int ga_win32_draw_system_cursor(vsource_frame_t *frame) {
 			goto quitFreeIconinfo;
 		}
 		if(msize > sizeof(mbits)) {
-			ga_error("vsource: B/W cursor too loarge, ignored.\n");
+			ga_error("vsource: B/W cursor too large, ignored.\n");
 			goto quitFreeIconinfo;
 		}
 		if(mask.bmHeight != mask.bmWidth<<1) {
