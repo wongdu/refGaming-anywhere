@@ -18,15 +18,13 @@
 
 #include "ga-win32-common.h"
 
-int
-ga_win32_draw_system_cursor(vsource_frame_t *frame) {
+int ga_win32_draw_system_cursor(vsource_frame_t *frame) {
 	static int capture_cursor = -1;
 	static unsigned char bitmask[8] = {
 		0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
 	};
 	int i, j, ptx, pty;
 	int ret = -1;
-	//
 	if(capture_cursor < 0) {
 		if(ga_conf_readbool("capture-cursor", 0) != 0) {
 			ga_error("vsource: capture-cursor enabled.\n");
@@ -37,13 +35,13 @@ ga_win32_draw_system_cursor(vsource_frame_t *frame) {
 	}
 	if(capture_cursor == 0)
 		return 0;
+
 #ifdef WIN32
 	ICONINFO iinfo;
 	CURSORINFO cinfo;
 	HCURSOR hc;
 	BITMAP mask, cursor;
-	int msize, csize;
-	//
+	int msize, csize;	
 	bzero(&cinfo, sizeof(cinfo));
 	cinfo.cbSize = sizeof(cinfo);
 	if(GetCursorInfo(&cinfo) == FALSE) {
@@ -61,7 +59,6 @@ ga_win32_draw_system_cursor(vsource_frame_t *frame) {
 		ga_error("vsource: GetIconInfo failed.\n");
 		goto quitFreeCursor;
 	}
-	//
 	GetObject(iinfo.hbmMask, sizeof(mask), &mask);
 	msize = mask.bmHeight * mask.bmWidthBytes;
 	if(iinfo.hbmColor != NULL) {
@@ -129,7 +126,7 @@ ga_win32_draw_system_cursor(vsource_frame_t *frame) {
 				}
 			}
 		}
-	} else {			// color cursor
+	} else { // color cursor
 		unsigned char mbits[8192];
 		unsigned char cbits[262144];
 		unsigned char *mcurr, *ccurr, *fcurr;
@@ -197,4 +194,3 @@ quitFreeCursor:
 #endif
 	return ret;
 }
-

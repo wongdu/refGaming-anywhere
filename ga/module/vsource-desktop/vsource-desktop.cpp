@@ -53,17 +53,26 @@
 
 #include "vsource-desktop.h"
 
+#include <string>
+#include <time.h>
+
 #include <cstring>
 #ifdef strncpy
 #undef strncpy
 #endif
 #include "CImg.h"
 
+#include <index/mih.h>
+#include <io/hashio.h>
+#include <io/pdqio.h>
+#include <hashing\pdqhashing.h>
+
 #define	SOURCES			1
 //#define	ENABLE_EMBED_COLORCODE	1	/* XXX: enabled at the filter, not here */
 
 using namespace std;
 using namespace cimg_library;
+using namespace facebook::pdq::hashing;
 
 static struct gaRect croprect;
 static struct gaRect *prect = NULL;
@@ -173,9 +182,61 @@ static int vsource_init(void *arg) {
 	return 0;
 }
 
+static Hash256 pdqhash;
+static bool bRefHash = false;
+static bool process_file(char* filename){
+	int quality;
+	int imageHeightTimesWidthUnused = 0;
+	float readSecondsUnused = 0.0;
+	float hashSecondsUnused = 0.0;
+	bool bRet = false;
+
+	try {
+		bRet = facebook::pdq::hashing::pdqHash256FromFile(
+			filename,
+			pdqhash,
+			quality,
+			imageHeightTimesWidthUnused,
+			readSecondsUnused,
+			hashSecondsUnused
+			);		
+	} catch (std::runtime_error& e) {
+		ga_error("Hash256 could not decode \"%s\".\n", filename);
+		return false;
+	}
+	ga_log("file name is: \"%s\",hash is: \"%s\",quality is: %d\n", filename, pdqhash.format().c_str(), quality);
+
+	return bRet;
+}
+
+static const int DOWNSAMPLE_DIMS = 512;
+static void pdqHash256FromCImgContent(CImg<uint8_t>& input, Hash256& hash){
+	//  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	if (input.height() > DOWNSAMPLE_DIMS || input.width() > DOWNSAMPLE_DIMS) {
+		input = input.resize(DOWNSAMPLE_DIMS, DOWNSAMPLE_DIMS);
+	}
+	//  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	int quality;
+	int numRows, numCols;
+	float* fullBuffer1 = loadFloatLumaFromCImg(input, numRows, numCols);
+	float* fullBuffer2 = new float[numRows * numCols];
+	float buffer64x64[64][64];
+	float buffer16x64[16][64];
+	float buffer16x16[16][16];
+
+	facebook::pdq::hashing::pdqHash256FromFloatLuma(fullBuffer1, fullBuffer2, numRows, numCols,
+		buffer64x64, buffer16x64, buffer16x16, hash, quality);
+	delete[] fullBuffer1;
+	delete[] fullBuffer2;
+}
 /*
  * vsource_threadproc accepts no arguments
  */
+//int distanceThreshold = DEFAULT_PDQ_DISTANCE_THRESHOLD;
+//static const int distanceThreshold = 32;
+static const int distanceThreshold = 48;
+static std::vector<std::pair<facebook::pdq::hashing::Hash256, std::string>> matches;
+
 static void * vsource_threadproc(void *arg) {
 	int i;
 	int token;
@@ -208,6 +269,13 @@ static void * vsource_threadproc(void *arg) {
 	gettimeofday(&initialTv, NULL);
 	lastTv = initialTv;
 	token = frame_interval;
+
+	facebook::pdq::index::MIH256<std::string> mih;
+	if (process_file(".\\frame_rgba.jpg")){
+		mih.insert(pdqhash, "ref_pic_0");
+		bRefHash = true;
+	}
+	
 	static unsigned int  saveNum = 0;
 	while(vsource_started != 0) {
 		// encoder has not launched?
@@ -283,11 +351,50 @@ static void * vsource_threadproc(void *arg) {
 			frame->imgbuf[idx + 2] = temp;
 		}
 #endif
-		saveNum++;
+		/*saveNum++;
 		if (saveNum == 100){
 			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
 			colormap.permute_axes("YZCX");
 			colormap.save("frame.jpg");
+		}*/
+		/*saveNum++;
+		if (saveNum == 100){
+			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
+			colormap.permute_axes("YZCX");
+			colormap = colormap.get_shared_channels(0, 2);
+			colormap.save("frame.jpg");
+		}*/
+		if (bRefHash ){
+			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
+			colormap.permute_axes("YZCX");
+			//CImg<> rgb = rgba.get_shared_channels(0,2);
+			colormap = colormap.get_shared_channels(0, 2);
+			//colormap.save("frame.jpg");
+			Hash256 currPdqhash;
+			pdqHash256FromCImgContent(colormap, currPdqhash);
+			matches.clear();
+			mih.queryAll(currPdqhash, distanceThreshold, matches);
+			for (auto itm : matches){
+				ga_log("current hash is: \"%s\",distance is: %d \n", currPdqhash.format().c_str(), itm.first.hammingDistance(currPdqhash));
+				if (itm.first.hammingDistance(currPdqhash)<45){
+					std::string strFileName = "";
+					saveNum++;
+					char timebuf[32];
+					struct tm* tm;
+					time_t now = 0;
+					now = time(NULL);
+					tm = localtime(&now);
+					strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
+					strFileName += timebuf;
+					strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash));	
+					strFileName += ".jpg";
+					//colormap.save(strFileName.c_str());
+					CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
+				}
+			}
+			/*if (matches.size() > 0){
+
+			}*/
 		}
 
 		//gImgPts++;

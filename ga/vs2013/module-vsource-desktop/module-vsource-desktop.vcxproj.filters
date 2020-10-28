@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{f700e4c3-430b-4027-89e0-1aac5f50a915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="downscaling">
+      <UniqueIdentifier>{66917ddd-9448-4f33-8943-d4c2645f0b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hashing">
+      <UniqueIdentifier>{ca78008c-be51-48f4-96d6-bf0cd87eb785}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="index">
+      <UniqueIdentifier>{38653fdc-5db5-43ea-90c9-2ed887d2b9ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{28cc318c-4ec2-4abd-973f-77a1d88dce96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\module\vsource-desktop\ga-win32-gdi.cpp">
@@ -24,6 +39,27 @@
     <ClCompile Include="..\..\module\vsource-desktop\ga-win32-common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\common\pdqhamming.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\common\pdqhashtypes.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\downscaling\downscaling.cpp">
+      <Filter>downscaling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\hashing\pdqhashing.cpp">
+      <Filter>hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\hashing\torben.cpp">
+      <Filter>hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\io\hashio.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\vsource-desktop\io\pdqio.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\module\vsource-desktop\ga-win32-gdi.h">
@@ -34,6 +70,33 @@
     </ClInclude>
     <ClInclude Include="..\..\module\vsource-desktop\CImg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\common\pdqbasetypes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\common\pdqhamming.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\common\pdqhashtypes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\downscaling\downscaling.h">
+      <Filter>downscaling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\hashing\pdqhashing.h">
+      <Filter>hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\hashing\torben.h">
+      <Filter>hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\index\mih.h">
+      <Filter>index</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\io\hashio.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\module\vsource-desktop\io\pdqio.h">
+      <Filter>io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
