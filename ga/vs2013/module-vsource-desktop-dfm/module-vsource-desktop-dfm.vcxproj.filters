@@ -18,10 +18,10 @@
     <ClCompile Include="..\..\module\vsource-desktop\ga-win32-dfm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\module\vsource-desktop\vsource-desktop.cpp">
+    <ClCompile Include="..\..\module\vsource-desktop\ga-win32-common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\module\vsource-desktop\ga-win32-common.cpp">
+    <ClCompile Include="..\..\module\vsource-desktop\vsource-desktop-dfm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

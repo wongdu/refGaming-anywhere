@@ -135,7 +135,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\module\vsource-desktop\ga-win32-common.cpp" />
     <ClCompile Include="..\..\module\vsource-desktop\ga-win32-d3d.cpp" />
-    <ClCompile Include="..\..\module\vsource-desktop\vsource-desktop.cpp" />
+    <ClCompile Include="..\..\module\vsource-desktop\vsource-desktop-d3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\module\vsource-desktop\ga-win32-common.h" />
