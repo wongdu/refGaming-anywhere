@@ -34,6 +34,7 @@ ga/vs2013/Release/mod/encoder-x264.dll
 ga/vs2013/Release/mod/encoder-video.dll
 ga/vs2013/Release/mod/encoder-audio.dll
 ga/vs2013/Release/mod/asource-system.dll
+ga/vs2013/Release/mod/ctrl-sdl.dll
 ga/vs2013/Release/ga-hook.dll
 ga/vs2013/ga-client/recv.raw
 Debug/*.idb
