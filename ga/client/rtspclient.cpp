@@ -550,8 +550,7 @@ typedef struct bwe_record_s {
 
 static map<unsigned int,bwe_record_t> bwe_watchlist;
 
-void
-bandwidth_estimator_update(unsigned int ssrc, unsigned short seq, struct timeval rcvtv, unsigned int timestamp, unsigned int pktsize) {
+void bandwidth_estimator_update(unsigned int ssrc, unsigned short seq, struct timeval rcvtv, unsigned int timestamp, unsigned int pktsize) {
 	bwe_record_t r;
 	map<unsigned int,bwe_record_t>::iterator mi;
 	bool sampleframe = true;
@@ -624,8 +623,6 @@ bandwidth_estimator_update(unsigned int ssrc, unsigned short seq, struct timeval
 	return;
 }
 
-////
-
 #if defined(WIN32) && !defined(MSYS)
 #pragma pack(push, 1)
 #endif
@@ -643,9 +640,7 @@ __attribute__((__packed__))
 ;
 
 typedef struct rtp_pkt_minimum_s rtp_pkt_minimum_t;
-
-void
-rtp_packet_handler(void *clientData, unsigned char *packet, unsigned &packetSize) {
+void rtp_packet_handler(void *clientData, unsigned char *packet, unsigned &packetSize) {
 	rtp_pkt_minimum_t *rtp = (rtp_pkt_minimum_t*) packet;
 	unsigned int ssrc;
 	unsigned short seqnum;
@@ -654,12 +649,12 @@ rtp_packet_handler(void *clientData, unsigned char *packet, unsigned &packetSize
 	struct timeval tv;
 	if(packet == NULL || packetSize < 12)
 		return;
+
 	gettimeofday(&tv, NULL);
 	ssrc = ntohl(rtp->ssrc);
 	seqnum = ntohs(rtp->seqnum);
 	flags = ntohs(rtp->flags);
 	timestamp = ntohl(rtp->timestamp);
-	//
 	if(log_rtp > 0) {
 #ifdef ANDROID
 		ga_log("%10u.%06u log_rtp: flags %04x seq %u ts %u ssrc %u size %u\n",
@@ -669,15 +664,13 @@ rtp_packet_handler(void *clientData, unsigned char *packet, unsigned &packetSize
 			flags, seqnum, timestamp, ssrc, packetSize);
 #endif
 	}
-	//
+
 	bandwidth_estimator_update(ssrc, seqnum, tv, timestamp, packetSize);
 	pktloss_monitor_update(ssrc, seqnum);
-	//
 	return;
 }
 
 //// drop frame feature
-
 typedef struct drop_vframe_s {
 	struct timeval tv_real_start;	// 1st wall-clock timestamp
 	struct timeval tv_stream_start;	// 1st pkt timestamp
@@ -687,8 +680,7 @@ typedef struct drop_vframe_s {
 static long long max_tolerable_video_delay_us = -1;
 static drop_vframe_t drop_vframe_ctx[VIDEO_SOURCE_CHANNEL_MAX];
 
-static void
-drop_video_frame_init(long long max_delay_us) {
+static void drop_video_frame_init(long long max_delay_us) {
 	bzero(&drop_vframe_ctx, sizeof(drop_vframe_ctx));
 	max_tolerable_video_delay_us = max_delay_us;
 	if(max_tolerable_video_delay_us > 0) {
@@ -699,13 +691,12 @@ drop_video_frame_init(long long max_delay_us) {
 	return;
 }
 
-static int
-drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsize, struct timeval pts) {
+static int drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsize, struct timeval pts) {
 	struct timeval now;
 	// disabled?
 	if(max_tolerable_video_delay_us <= 0)
 		return 0;
-	//
+	
 	gettimeofday(&now, NULL);
 	if(drop_vframe_ctx[ch].tv_real_start.tv_sec == 0) {
 		drop_vframe_ctx[ch].tv_real_start = now;
@@ -715,7 +706,6 @@ drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsize, struct t
 			max_tolerable_video_delay_us);
 		return 0;
 	}
-	//
 	do {
 		if(video_codec_id == AV_CODEC_ID_H264) {
 			int offset, nalt;
@@ -738,8 +728,7 @@ drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsize, struct t
 				drop_vframe_ctx[ch].no_drop = 4;
 			} else if(nalt == 0x08) { /* pps */
 				drop_vframe_ctx[ch].no_drop = 3;
-			}
-			//
+			}		
 			long long dstream = tvdiff_us(&pts, &drop_vframe_ctx[ch].tv_stream_start);
 			long long dreal = tvdiff_us(&now, &drop_vframe_ctx[ch].tv_real_start);
 			if(drop_vframe_ctx[ch].no_drop > 0)
@@ -752,14 +741,10 @@ drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsize, struct t
 			}
 		}
 	} while(0);
-	//
 	return 0;
 }
 
-////
-
-static int
-play_video_priv(int ch/*channel*/, unsigned char *buffer, int bufsize, struct timeval pts) {
+static int play_video_priv(int ch/*channel*/, unsigned char *buffer, int bufsize, struct timeval pts) {
 	AVPacket avpkt;
 	int got_picture, len;
 #ifndef ANDROID
@@ -789,7 +774,6 @@ play_video_priv(int ch/*channel*/, unsigned char *buffer, int bufsize, struct ti
 	if(drop_video_frame(ch, buffer, bufsize, pts)) {
 		return bufsize;
 	}
-	//
 #ifdef SAVE_ENC
 	if(fout != NULL) {
 		fwrite(buffer, sizeof(char), bufsize, fout);
@@ -803,20 +787,16 @@ play_video_priv(int ch/*channel*/, unsigned char *buffer, int bufsize, struct ti
 	do {
 		int codelen = 0;
 		unsigned char *ptr = NULL;
-		//
 		fprintf(stderr, "[XXX-nalcode]");
 		for(	ptr = ga_find_startcode(avpkt.data, avpkt.data+avpkt.size, &codelen);
 			ptr != NULL;
 			ptr = ga_find_startcode(ptr+codelen, avpkt.data+avpkt.size, &codelen)) {
-			//
 			fprintf(stderr, " (+%d|%d)-%02x", ptr-avpkt.data, codelen, ptr[codelen] & 0x1f);
 		}
 		fprintf(stderr, "\n");
 	} while(0);
 #endif
-	//
 	while(avpkt.size > 0) {
-		//
 #ifdef PRINT_LATENCY
 		gettimeofday(&ptv0, NULL);
 #endif
@@ -1076,8 +1056,7 @@ static unsigned char *convbuf = NULL;
 static int max_decoder_size = 0;
 static int audio_start = 0;
 
-unsigned char *
-audio_buffer_init() {
+unsigned char * audio_buffer_init() {
 	if(audiobuf == NULL) {
 		audiobuf = (unsigned char*) malloc(abmaxsize);
 		if(audiobuf == NULL) {
@@ -1087,8 +1066,7 @@ audio_buffer_init() {
 	return audiobuf;
 }
 
-int
-audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
+int audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 	const unsigned char *srcplanes[SWR_CH_MAX];
 	unsigned char *dstplanes[SWR_CH_MAX];
 	unsigned char *saveptr;
@@ -1107,8 +1085,7 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 			pkt->size -= len;
 			pkt->data += len;
 			continue;
-		}
-	
+		}	
 		if(aframe->format == rtspconf->audio_device_format) {
 			datalen = av_samples_get_buffer_size(NULL,
 					aframe->channels/*rtspconf->audio_channels*/,
@@ -1172,7 +1149,6 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 						aframe->channels,
 						aframe->nb_samples,
 						(AVSampleFormat) aframe->format, 1/*no-alignment*/);
-				//
 #endif
 				for(i = 1; i < aframe->channels; i++) {
 					//srcplanes[i] = srcplanes[i-1] + srclines[i-1];
@@ -1194,12 +1170,10 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 			rtsperror("decoded audio truncated.\n");
 			datalen = dstlen;
 		}
-		//
 		bcopy(srcbuf, dstbuf, datalen);
 		dstbuf += datalen;
 		dstlen -= datalen;
 		filled += datalen;
-		//
 		pkt->size -= len;
 		pkt->data += len;
 	}
@@ -1209,8 +1183,7 @@ audio_buffer_decode(AVPacket *pkt, unsigned char *dstbuf, int dstlen) {
 	return filled;
 }
 
-int
-audio_buffer_fill(void *userdata, unsigned char *stream, int ssize) {
+int audio_buffer_fill(void *userdata, unsigned char *stream, int ssize) {
 	int filled = 0;
 	AVPacket avpkt;
 #ifdef ANDROID
@@ -1218,7 +1191,6 @@ audio_buffer_fill(void *userdata, unsigned char *stream, int ssize) {
 #else
 	AVCodecContext *adecoder = (AVCodecContext*) userdata;
 #endif
-	//
 	if(audio_buffer_init() == NULL) {
 		rtsperror("audio decoder: cannot allocate audio buffer\n");
 #ifdef ANDROID
@@ -1257,12 +1229,10 @@ audio_buffer_fill(void *userdata, unsigned char *stream, int ssize) {
 			break;
 		absize += dsize;
 	}
-	//
 	return filled;
 }
 
-void
-audio_buffer_fill_sdl(void *userdata, unsigned char *stream, int ssize) {
+void audio_buffer_fill_sdl(void *userdata, unsigned char *stream, int ssize) {
 	int filled;
 	if((filled = audio_buffer_fill(userdata, stream, ssize)) < 0) {
 		rtsperror("audio buffer fill failed.\n");
@@ -1276,16 +1246,13 @@ audio_buffer_fill_sdl(void *userdata, unsigned char *stream, int ssize) {
 	return;
 }
 
-static void
-play_audio(unsigned char *buffer, int bufsize, struct timeval pts) {
+static void play_audio(unsigned char *buffer, int bufsize, struct timeval pts) {
 #ifdef ANDROID
 	if(rtspconf->builtin_audio_decoder != 0) {
 		android_decode_audio(rtspParam, buffer, bufsize, pts);
 	} else {
-	////////////////////////////////////////
 #endif
 	AVPacket avpkt;
-	//
 	av_init_packet(&avpkt);
 	avpkt.data = buffer;
 	avpkt.size = bufsize;
@@ -1312,14 +1279,12 @@ play_audio(unsigned char *buffer, int bufsize, struct timeval pts) {
 	}
 #endif
 #ifdef ANDROID
-	////////////////////////////////////////
 	}
 #endif
 	return;
 }
 
-void *
-rtsp_thread(void *param) {
+void * rtsp_thread(void *param) {
 	RTSPClient *client = NULL;
 	BasicTaskScheduler0 *bs = BasicTaskScheduler::createNew();
 	TaskScheduler* scheduler = bs;
@@ -1335,7 +1300,6 @@ rtsp_thread(void *param) {
 	if(savefp_yuvts != NULL)
 		ga_save_close(savefp_yuvts);
 	savefp_yuv = savefp_yuvts = NULL;
-	//
 	if(ga_conf_readbool("log-rtp-packet", 0) != 0)
 		log_rtp = 1;
 	if(ga_conf_readv("save-yuv-image", savefile_yuv, sizeof(savefile_yuv)) != NULL)
@@ -1346,12 +1310,10 @@ rtsp_thread(void *param) {
 	rtsperror("*** SAVEFILE: YUV image saved to '%s'; timestamp saved to '%s'.\n",
 		savefp_yuv   ? savefile_yuv   : "NULL",
 		savefp_yuvts ? savefile_yuvts : "NULL");
-	//
 	if(ga_conf_readint("rtp-reordering-threshold") > 0) {
 		rtp_packet_reordering_threshold = ga_conf_readint("rtp-reordering-threshold");
 	}
 	rtsperror("RTP reordering threshold = %d\n", rtp_packet_reordering_threshold);
-	//
 	pktloss_monitor_init();
 	port2channel.clear();
 	video_sess_fmt = -1;
@@ -1363,22 +1325,18 @@ rtsp_thread(void *param) {
 	video_framing = 0;
 	audio_framing = 0;
 	rtspClientCount = 0;
-	//
 	rtspconf = rtspconf_global();
 	rtspParam = (RTSPThreadParam*) param;
 	rtspParam->videostate = RTSP_VIDEOSTATE_NULL;
-	//
 	if(init_decoder_buffer() < 0) {
 		rtsperror("init decode buffer failed.\n");
 		return NULL;
 	}
-	//
 	if(qos_init(env) < 0) {
 		deinit_decoder_buffer();
 		rtsperror("qos-measurement: init failed.\n");
 		return NULL;
 	}
-	//
 	if((client = openURL(*env, rtspParam->url)) == NULL) {
 		deinit_decoder_buffer();
 		rtsperror("connect to %s failed.\n", rtspParam->url);
@@ -1387,7 +1345,6 @@ rtsp_thread(void *param) {
 	while(rtspParam->quitLive555 == 0) {
 		bs->SingleStep(1000000);
 	}
-	//
 	qos_deinit();
 	if(savefp_yuv != NULL) {
 		ga_save_close(savefp_yuv);
@@ -1397,7 +1354,6 @@ rtsp_thread(void *param) {
 		ga_save_close(savefp_yuvts);
 		savefp_yuvts = NULL;
 	}
-	//
 	shutdownStream(client);
 	deinit_decoder_buffer();
 	// release resources in rtspThreadParam
@@ -1407,15 +1363,12 @@ rtsp_thread(void *param) {
 			rtspParam->pipe[i] = NULL;
 		}
 	}
-	//
 	rtsperror("rtsp thread: terminated.\n");
 #ifndef ANDROID
 	exit(0);
 #endif
 	return NULL;
 }
-
-//////////////////////////////////////////////////////////////////////////////
 
 class StreamClientState {
 public:
@@ -1478,8 +1431,7 @@ private:
 #define RTSP_CLIENT_VERBOSITY_LEVEL 1 // by default, print verbose output from each "RTSPClient"
 
 
-RTSPClient *
-openURL(UsageEnvironment& env, char const* rtspURL) {
+RTSPClient * openURL(UsageEnvironment& env, char const* rtspURL) {
 	RTSPClient* rtspClient =
 		ourRTSPClient::createNew(env, rtspURL, RTSP_CLIENT_VERBOSITY_LEVEL, "RTSP Client"/*"rtsp_thread"*/);
 	if (rtspClient == NULL) {
@@ -1489,14 +1441,11 @@ openURL(UsageEnvironment& env, char const* rtspURL) {
 	}
 
 	++rtspClientCount;
-
 	rtspClient->sendDescribeCommand(continueAfterDESCRIBE); 
-
 	return rtspClient;
 }
 
-void
-continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString) {
 	do {
 		UsageEnvironment& env = rtspClient->envir(); // alias
 		StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
@@ -1535,8 +1484,7 @@ continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString
 #endif
 }
 
-void
-setupNextSubsession(RTSPClient* rtspClient) {
+void setupNextSubsession(RTSPClient* rtspClient) {
 	UsageEnvironment& env = rtspClient->envir(); // alias
 	StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
 	bool rtpOverTCP = false;
@@ -1597,7 +1545,6 @@ setupNextSubsession(RTSPClient* rtspClient) {
 					rtsperror("video decoder(%d) initialized (client port %d)\n",
 						cid, scs.subsession->clientPortNum());
 #ifdef ANDROID
-					////////////////////////
 					}
 #endif
 				}
@@ -1620,7 +1567,6 @@ setupNextSubsession(RTSPClient* rtspClient) {
 				if(android_prepare_audio(rtspParam, mime, rtspconf->builtin_audio_decoder != 0) < 0)
 					return;
 				if(rtspconf->builtin_audio_decoder == 0) {
-				//////////////////////////////////////
 				rtsperror("init software audio decoder.\n");
 #endif
 				if(adecoder == NULL) {
@@ -1631,7 +1577,6 @@ setupNextSubsession(RTSPClient* rtspClient) {
 					}
 				}
 #ifdef ANDROID
-				//////////////////////////////////////
 				}
 #endif
 				rtsperror("audio decoder initialized.\n");
@@ -1644,15 +1589,13 @@ setupNextSubsession(RTSPClient* rtspClient) {
 		}
 		return;
 	} while(0);
-	//
 
 	// We've finished setting up all of the subsessions.  Now, send a RTSP "PLAY" command to start the streaming:
 	scs.duration = scs.session->playEndTime() - scs.session->playStartTime();
 	rtspClient->sendPlayCommand(*scs.session, continueAfterPLAY);
 }
 
-static void
-NATHolePunch(RTPSource *rtpsrc, MediaSubsession *subsession) {
+static void NATHolePunch(RTPSource *rtpsrc, MediaSubsession *subsession) {
 	Groupsock *gs = NULL;
 	int s;
 	struct sockaddr_in sin;
@@ -1680,7 +1623,6 @@ NATHolePunch(RTPSource *rtpsrc, MediaSubsession *subsession) {
 		rtsperror("NAT hole punching: no Groupsock available.\n");
 		return;
 	}
-	//
 	s = gs->socketNum();
 	if(getsockname(s, (struct sockaddr*) &sin, &sinlen) < 0) {
 		rtsperror("NAT hole punching: getsockname - %s.\n", strerror(errno));
@@ -1688,7 +1630,7 @@ NATHolePunch(RTPSource *rtpsrc, MediaSubsession *subsession) {
 	}
 	rtsperror("NAT hole punching: fd=%d, local-port=%d/%d server-port=%d\n",
 		s, ntohs(sin.sin_port), subsession->clientPortNum(), subsession->serverPortNum);
-	//
+
 	bzero(&sin, sizeof(sin));
 	sin.sin_addr = rtspconf->sin.sin_addr;
 	sin.sin_port = htons(subsession->serverPortNum);
@@ -1699,12 +1641,11 @@ NATHolePunch(RTPSource *rtpsrc, MediaSubsession *subsession) {
 	sendto(s, (const char *) buf, 1, 0, (struct sockaddr*) &sin, sizeof(sin)); usleep(5000);
 	sendto(s, (const char *) buf, 1, 0, (struct sockaddr*) &sin, sizeof(sin)); usleep(5000);
 	sendto(s, (const char *) buf, 1, 0, (struct sockaddr*) &sin, sizeof(sin)); usleep(5000);
-	//
+	
 	return;
 }
 
-void
-continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString) {
 	do {
 		UsageEnvironment& env = rtspClient->envir(); // alias
 		StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
@@ -1748,8 +1689,7 @@ continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString) {
 	setupNextSubsession(rtspClient);
 }
 
-void
-continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString) {
 	do {
 		UsageEnvironment& env = rtspClient->envir(); // alias
 		StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
@@ -1781,8 +1721,7 @@ continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString) {
 	shutdownStream(rtspClient);
 }
 
-void
-subsessionAfterPlaying(void* clientData) {
+void subsessionAfterPlaying(void* clientData) {
 	MediaSubsession* subsession = (MediaSubsession*)clientData;
 	RTSPClient* rtspClient = (RTSPClient*)(subsession->miscPtr);
 
@@ -1801,31 +1740,25 @@ subsessionAfterPlaying(void* clientData) {
 	shutdownStream(rtspClient);
 }
 
-void
-subsessionByeHandler(void* clientData) {
+void subsessionByeHandler(void* clientData) {
 	MediaSubsession* subsession = (MediaSubsession*)clientData;
 	RTSPClient* rtspClient = (RTSPClient*)subsession->miscPtr;
 	UsageEnvironment& env = rtspClient->envir(); // alias
-
 	env << *rtspClient << "Received RTCP \"BYE\" on \"" << *subsession << "\" subsession\n";
 
 	// Now act as if the subsession had closed:
 	subsessionAfterPlaying(subsession);
 }
 
-void
-streamTimerHandler(void* clientData) {
+void streamTimerHandler(void* clientData) {
 	ourRTSPClient* rtspClient = (ourRTSPClient*)clientData;
 	StreamClientState& scs = rtspClient->scs; // alias
-
 	scs.streamTimerTask = NULL;
-
 	// Shut down the stream:
 	shutdownStream(rtspClient);
 }
 
-void
-shutdownStream(RTSPClient* rtspClient, int exitCode) {
+void shutdownStream(RTSPClient* rtspClient, int exitCode) {
 	UsageEnvironment& env = rtspClient->envir(); // alias
 	StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
 
@@ -1872,11 +1805,9 @@ shutdownStream(RTSPClient* rtspClient, int exitCode) {
 	}
 }
 
-
 // Implementation of "ourRTSPClient":
 
-ourRTSPClient*
-ourRTSPClient::createNew(UsageEnvironment& env, char const* rtspURL,
+ourRTSPClient* ourRTSPClient::createNew(UsageEnvironment& env, char const* rtspURL,
 	int verbosityLevel, char const* applicationName, portNumBits tunnelOverHTTPPortNum) {
 	return new ourRTSPClient(env, rtspURL, verbosityLevel, applicationName, tunnelOverHTTPPortNum);
 }
@@ -1890,7 +1821,6 @@ ourRTSPClient::~ourRTSPClient() {
 }
 
 // Implementation of "StreamClientState":
-
 StreamClientState::StreamClientState()
 	: iter(NULL), session(NULL), subsession(NULL), streamTimerTask(NULL), duration(0.0) {
 }
@@ -1912,8 +1842,7 @@ StreamClientState::~StreamClientState() {
 // Define the size of the buffer that we'll use:
 #define DUMMY_SINK_RECEIVE_BUFFER_SIZE 1048576	//100000
 
-DummySink*
-DummySink::createNew(UsageEnvironment& env, MediaSubsession& subsession, char const* streamId) {
+DummySink* DummySink::createNew(UsageEnvironment& env, MediaSubsession& subsession, char const* streamId) {
 	return new DummySink(env, subsession, streamId);
 }
 
@@ -1939,8 +1868,7 @@ DummySink::~DummySink() {
 	delete[] fStreamId;
 }
 
-void
-DummySink::afterGettingFrame(void* clientData, unsigned frameSize, unsigned numTruncatedBytes,
+void DummySink::afterGettingFrame(void* clientData, unsigned frameSize, unsigned numTruncatedBytes,
 		struct timeval presentationTime, unsigned durationInMicroseconds) {
 	DummySink* sink = (DummySink*)clientData;
 	sink->afterGettingFrame(frameSize, numTruncatedBytes, presentationTime, durationInMicroseconds);
@@ -1949,8 +1877,7 @@ DummySink::afterGettingFrame(void* clientData, unsigned frameSize, unsigned numT
 // If you don't want to see debugging output for each received frame, then comment out the following line:
 #define DEBUG_PRINT_EACH_RECEIVED_FRAME 1
 
-void
-DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes,
+void DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes,
 		struct timeval presentationTime, unsigned /*durationInMicroseconds*/) {
 #ifndef ANDROID
 	extern pthread_mutex_t watchdogMutex;
@@ -1975,7 +1902,6 @@ DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes,
 		if(rtpsrc != NULL) {
 			marker = rtpsrc->curPacketMarkerBit();
 		}
-		//
 		if(stats != NULL) {
 			lost = pktloss_monitor_get(stats->SSRC(), &count, 1/*reset*/);
 #if 0
@@ -1984,7 +1910,6 @@ DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes,
 			}
 #endif
 		}
-		//
 		play_video(channel,
 			fReceiveBuffer+MAX_FRAMING_SIZE-video_framing,
 			frameSize+video_framing, presentationTime,
@@ -2008,8 +1933,7 @@ dropped:
 	continuePlaying();
 }
 
-Boolean
-DummySink::continuePlaying() {
+Boolean DummySink::continuePlaying() {
 	if (fSource == NULL) return False; // sanity check (should not happen)
 
 	// Request the next frame of data from our input source.  "afterGettingFrame()" will get called later, when it arrives:
@@ -2019,4 +1943,3 @@ DummySink::continuePlaying() {
 			onSourceClosure, this);
 	return True;
 }
-

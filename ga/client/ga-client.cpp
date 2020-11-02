@@ -91,8 +91,7 @@ static FILE *savefp_keyts = NULL;
 static TTF_Font *defFont = NULL;
 #endif
 
-static void
-switch_fullscreen() {
+static void switch_fullscreen() {
 	unsigned int flags;
 	SDL_Window *w = NULL;
 	pthread_mutex_lock(&rtspThreadParam.surfaceMutex[0]);
@@ -106,11 +105,9 @@ quit:
 	return;
 }
 
-static void
-switch_grab_input(SDL_Window *w) {
+static void switch_grab_input(SDL_Window *w) {
 	SDL_bool grabbed;
 	int need_unlock = 0;
-	//
 	if(w == NULL) {
 		pthread_mutex_lock(&rtspThreadParam.surfaceMutex[0]);
 		w = rtspThreadParam.surface[0];
@@ -129,18 +126,15 @@ switch_grab_input(SDL_Window *w) {
 	return;
 }
 
-static int
-xlat_mouseX(int ch, int x) {
+static int xlat_mouseX(int ch, int x) {
 	return (1.0 * nativeSizeX[ch] / windowSizeX[ch]) * x;
 }
 
-static int
-xlat_mouseY(int ch, int y) {
+static int xlat_mouseY(int ch, int y) {
 	return (1.0 * nativeSizeY[ch] / windowSizeY[ch]) * y;
 }
 
-static void
-create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
+static void create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 	int w, h;
 	AVPixelFormat format;
 #if 1	// only support SDL2
@@ -154,8 +148,7 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 	dpipe_t *pipe = NULL;
 	dpipe_buffer_t *data = NULL;
 	char windowTitle[64];
-	char pipename[64];
-	//
+	char pipename[64];	
 	pthread_mutex_lock(&rtspParam->surfaceMutex[ch]);
 	if(rtspParam->surface[ch] != NULL) {
 		pthread_mutex_unlock(&rtspParam->surfaceMutex[ch]);
@@ -228,7 +221,6 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 #endif		////
 		ga_error("ga-client: relative mouse mode enabled.\n");
 	}
-	//
 #if 1	// only support SDL2
 	do {	// choose SW or HW renderer?
 		// XXX: Windows crashed if there is not a HW renderer!
@@ -258,7 +250,6 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 				renderer_flags = SDL_RENDERER_ACCELERATED;
 		}
 	} while(0);
-	//
 	renderer = SDL_CreateRenderer(surface, renderer_index, renderer_flags);
 			//rtspconf->video_renderer_software ?
 			//	SDL_RENDERER_SOFTWARE : renderer_flags);
@@ -266,7 +257,6 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 		rtsperror("ga-client: create renderer failed.\n");
 		exit(-1);
 	}
-	//
 	overlay = SDL_CreateTexture(renderer,
 			SDL_PIXELFORMAT_YV12,
 			SDL_TEXTUREACCESS_STREAMING,
@@ -276,7 +266,6 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 		rtsperror("ga-client: create overlay (textuer) failed.\n");
 		exit(-1);
 	}
-	//
 	pthread_mutex_lock(&rtspParam->surfaceMutex[ch]);
 	rtspParam->pipe[ch] = pipe;
 	rtspParam->swsctx[ch] = swsctx;
@@ -287,18 +276,15 @@ create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 #endif
 	rtspParam->surface[ch] = surface;
 	pthread_mutex_unlock(&rtspParam->surfaceMutex[ch]);
-	//
 	rtsperror("ga-client: window created successfully (%dx%d).\n", w, h);
 	// initialize watchdog
 	pthread_mutex_lock(&watchdogMutex);
 	gettimeofday(&watchdogTimer, NULL);
 	pthread_mutex_unlock(&watchdogMutex);
-	//
 	return;
 }
 
-static void
-open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecoder) {
+static void open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecoder) {
 	SDL_AudioSpec wanted, spec;
 	//
 	wanted.freq = rtspconf->audio_samplerate;
@@ -345,29 +331,24 @@ render_text(SDL_Renderer *renderer, SDL_Window *window, int x, int y, int line, 
 	SDL_Rect dest = {0, 0, 0, 0}, boxRect;
 	SDL_Texture *texture;
 	int ww, wh;
-	//
 	if(window == NULL || renderer == NULL) {
 		rtsperror("render_text: Invalid window(%p) or renderer(%p) received.\n",
 			window, renderer);
 		return;
 	}
-	//
 	SDL_GetWindowSize(window, &ww, &wh);
 	// centering X/Y?
 	if(x >= 0) {	dest.x = x; }
 	else {		dest.x = (ww - textSurface->w)/2; }
 	if(y >= 0) {	dest.y = y; }
 	else {		dest.y = (wh - textSurface->h)/2; }
-	//
 	dest.y += line * textSurface->h;
 	dest.w = textSurface->w;
 	dest.h = textSurface->h;
-	//
 	boxRect.x = dest.x - 6;
 	boxRect.y = dest.y - 6;
 	boxRect.w = dest.w + 12;
 	boxRect.h = dest.h + 12;
-	//
 	if((texture = SDL_CreateTextureFromSurface(renderer, textSurface)) != NULL) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderFillRect(renderer, &boxRect);
@@ -376,15 +357,13 @@ render_text(SDL_Renderer *renderer, SDL_Window *window, int x, int y, int line, 
 	} else {
 		rtsperror("render_text: failed on creating text texture: %s\n", SDL_GetError());
 	}
-	//
 	SDL_FreeSurface(textSurface);
 #endif
 	return;
 }
 
 #if 1
-static void
-render_image(struct RTSPThreadParam *rtspParam, int ch) {
+static void render_image(struct RTSPThreadParam *rtspParam, int ch) {
 	dpipe_buffer_t *data;
 	AVPicture *vframe;
 	SDL_Rect rect;
@@ -392,12 +371,11 @@ render_image(struct RTSPThreadParam *rtspParam, int ch) {
 	unsigned char *pixels;
 	int pitch;
 #endif
-	//
+	
 	if((data = dpipe_load_nowait(rtspParam->pipe[ch])) == NULL) {
 		return;
 	}
 	vframe = (AVPicture*) data->pointer;
-	//
 #if 1	// only support SDL2
 	if(SDL_LockTexture(rtspParam->overlay[ch], NULL, (void**) &pixels, &pitch) == 0) {
 		bcopy(vframe->data[0], pixels, rtspParam->width[ch] * rtspParam->height[ch]);
@@ -417,20 +395,16 @@ render_image(struct RTSPThreadParam *rtspParam, int ch) {
 	SDL_RenderCopy(rtspParam->renderer[ch], rtspParam->overlay[ch], NULL, NULL);
 	SDL_RenderPresent(rtspParam->renderer[ch]);
 #endif
-	//
 	image_rendered = 1;
-	//
 	return;
 }
 #endif
 
-void
-ProcessEvent(SDL_Event *event) {
+void ProcessEvent(SDL_Event *event) {
 	sdlmsg_t m;
 	map<unsigned int,int>::iterator mi;
 	int ch;
 	struct timeval tv;
-	//
 	switch(event->type) {
 	case SDL_KEYUP:
 		if(event->key.keysym.sym == SDLK_BACKQUOTE
@@ -643,14 +617,11 @@ ProcessEvent(SDL_Event *event) {
 	return;
 }
 
-static void *
-watchdog_thread(void *args) {
+static void * watchdog_thread(void *args) {
 	static char idlemsg[128];
 	struct timeval tv;
-	SDL_Event evt;
-	//
+	SDL_Event evt;	
 	rtsperror("watchdog: launched, waiting for audio/video frames ...\n");
-	//
 	while(true) {
 #ifdef WIN32
 		Sleep(1000);
@@ -912,24 +883,21 @@ int main(int argc, char *argv[])
 #endif
 	// enable logging
 	ga_openlog();
-	//
 	if(ga_conf_readbool("control-relative-mouse-mode", 0) != 0) {
 		rtsperror("*** Relative mouse mode enabled.\n");
 		relativeMouseMode = 1;
 	}
-	//
+
 	if(ga_conf_readv("save-key-timestamp", savefile_keyts, sizeof(savefile_keyts)) != NULL) {
 		savefp_keyts = ga_save_init_txt(savefile_keyts);
 		rtsperror("*** SAVEFILE: key timestamp saved fo '%s'\n",
 			savefp_keyts ? savefile_keyts : "NULL");
 	}
-	//
 	rtspconf = rtspconf_global();
 	if(rtspconf_parse(rtspconf) < 0) {
 		rtsperror("parse configuration failed.\n");
 		return -1;
 	}
-	//
 #if ! defined WIN32 && ! defined __APPLE__ && ! defined ANDROID
 	if(XInitThreads() == 0) {
 		rtsperror("XInitThreads() failed, client terminated.\n");
