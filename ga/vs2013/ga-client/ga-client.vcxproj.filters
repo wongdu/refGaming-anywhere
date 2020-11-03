@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{fdb22e9a-ddfe-4ef7-9aab-1211cae47de7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="downscaling">
+      <UniqueIdentifier>{9409bf39-ea62-4f27-8017-af901750c6a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hashing">
+      <UniqueIdentifier>{8ea4b454-d9ae-4f6a-8a1e-5b042dd82503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="index">
+      <UniqueIdentifier>{3bce091a-df28-4a5f-a1a0-78415db289e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{584ed37c-8bfe-4e39-a883-760825af2008}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\client\ctrl-sdl.cpp">
@@ -33,6 +48,27 @@
     <ClCompile Include="..\..\client\rtspclient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\client\common\pdqhamming.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\pdqhashtypes.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\downscaling\downscaling.cpp">
+      <Filter>downscaling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\hashing\pdqhashing.cpp">
+      <Filter>hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\hashing\torben.cpp">
+      <Filter>hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\io\hashio.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\io\pdqio.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\client\ctrl-sdl.h">
@@ -48,6 +84,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\client\rtspclient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\pdqbasetypes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\pdqhamming.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\pdqhashtypes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\downscaling\downscaling.h">
+      <Filter>downscaling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\hashing\pdqhashing.h">
+      <Filter>hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\hashing\torben.h">
+      <Filter>hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\index\mih.h">
+      <Filter>index</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\io\hashio.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\io\pdqio.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\CImg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
