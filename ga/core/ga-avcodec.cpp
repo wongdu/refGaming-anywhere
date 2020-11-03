@@ -45,11 +45,9 @@ ga_swscale_init(PixelFormat format, int inW, int inH, int outW, int outH) {
 	return swsctx;
 }*/
 
-AVFormatContext*
-ga_format_init(const char *filename) {
+AVFormatContext* ga_format_init(const char *filename) {
 	AVOutputFormat *fmt;
 	AVFormatContext *ctx;
-	//
 	if((fmt = av_guess_format(NULL, filename, NULL)) == NULL) {
 		if((fmt = av_guess_format("mkv", NULL, NULL)) == NULL) {
 			fprintf(stderr, "# cannot find suitable format.\n");
@@ -60,25 +58,20 @@ ga_format_init(const char *filename) {
 		fprintf(stderr, "# create avformat context failed.\n");
 		return NULL;
 	}
-	//
 	ctx->oformat = fmt;
 	snprintf(ctx->filename, sizeof(ctx->filename), "%s", filename);
-	//
 	if((fmt->flags & AVFMT_NOFILE) == 0) {
 		if(avio_open(&ctx->pb, ctx->filename, AVIO_FLAG_WRITE) < 0) {
 			fprintf(stderr, "# cannot create file '%s'\n", ctx->filename);
 			return NULL;
 		}
 	}
-	//
 	return ctx;
 }
 
-AVFormatContext*
-ga_rtp_init(const char *url) {
+AVFormatContext* ga_rtp_init(const char *url) {
 	AVOutputFormat *fmt;
-	AVFormatContext *ctx;
-	//
+	AVFormatContext *ctx;	
 	if((fmt = av_guess_format("rtp", NULL, NULL)) == NULL) {
 		fprintf(stderr, "# rtp is not supported.\n");
 		return NULL;
@@ -87,22 +80,18 @@ ga_rtp_init(const char *url) {
 		fprintf(stderr, "# create avformat context failed.\n");
 		return NULL;
 	}
-	//
 	ctx->oformat = fmt;
 	snprintf(ctx->filename, sizeof(ctx->filename), "%s", url);
-	//
 	//if((fmt->flags & AVFMT_NOFILE) == 0) {
 		if(avio_open(&ctx->pb, ctx->filename, AVIO_FLAG_WRITE) < 0) {
 			fprintf(stderr, "# cannot create file '%s'\n", ctx->filename);
 			return NULL;
 		}
 	//}
-	//
 	return ctx;
 }
 
-AVStream *
-ga_avformat_new_stream(AVFormatContext *ctx, int id, AVCodec *codec) {
+AVStream * ga_avformat_new_stream(AVFormatContext *ctx, int id, AVCodec *codec) {
 	AVStream *st = NULL;
 	if(codec == NULL)
 		return NULL;
@@ -121,8 +110,7 @@ ga_avformat_new_stream(AVFormatContext *ctx, int id, AVCodec *codec) {
 	return st;
 }
 
-AVCodec*
-ga_avcodec_find_encoder(const char **names, enum AVCodecID cid) {
+AVCodec* ga_avcodec_find_encoder(const char **names, enum AVCodecID cid) {
 	AVCodec *codec = NULL;
 	if(names != NULL) {
 		while(*names != NULL) {
@@ -136,8 +124,7 @@ ga_avcodec_find_encoder(const char **names, enum AVCodecID cid) {
 	return NULL;
 }
 
-AVCodec*
-ga_avcodec_find_decoder(const char **names, enum AVCodecID cid) {
+AVCodec* ga_avcodec_find_decoder(const char **names, enum AVCodecID cid) {
 	AVCodec *codec = NULL;
 	if(names != NULL) {
 		while(*names != NULL) {
@@ -151,8 +138,7 @@ ga_avcodec_find_decoder(const char **names, enum AVCodecID cid) {
 	return NULL;
 }
 
-AVCodecContext*
-ga_avcodec_vencoder_init(AVCodecContext *ctx, AVCodec *codec, int width, int height, int fps, vector<string> *vso) {
+AVCodecContext* ga_avcodec_vencoder_init(AVCodecContext *ctx, AVCodec *codec, int width, int height, int fps, vector<string> *vso) {
 	AVDictionary *opts = NULL;
 
 	if(codec == NULL) {
@@ -179,7 +165,6 @@ ga_avcodec_vencoder_init(AVCodecContext *ctx, AVCodec *codec, int width, int hei
 	ctx->height = height;
 	//ctx->gop_size = fps * 2;
 	//ctx->gop_size = 10;
-
 #if 0
         av_dict_set(&opts, "profile", "baseline", 0);
 	av_dict_set(&opts, "preset", "superfast", 0);
@@ -213,8 +198,7 @@ ga_avcodec_vencoder_init(AVCodecContext *ctx, AVCodec *codec, int width, int hei
 	return ctx;
 }
 
-AVCodecContext*
-ga_avcodec_aencoder_init(AVCodecContext *ctx, AVCodec *codec, int bitrate, int samplerate, int channels, AVSampleFormat format, uint64_t chlayout) {
+AVCodecContext* ga_avcodec_aencoder_init(AVCodecContext *ctx, AVCodec *codec, int bitrate, int samplerate, int channels, AVSampleFormat format, uint64_t chlayout) {
 	AVDictionary *opts = NULL;
 
 	if(codec == NULL) {
@@ -254,8 +238,7 @@ ga_avcodec_aencoder_init(AVCodecContext *ctx, AVCodec *codec, int bitrate, int s
 	return ctx;
 }
 
-void
-ga_avcodec_close(AVCodecContext *ctx) {
+void ga_avcodec_close(AVCodecContext *ctx) {
 	if(ctx == NULL)
 		return;
 	pthread_mutex_lock(&avcodec_open_mutex);
@@ -265,4 +248,3 @@ ga_avcodec_close(AVCodecContext *ctx) {
 	pthread_mutex_unlock(&avcodec_open_mutex);
 	return;
 }
-

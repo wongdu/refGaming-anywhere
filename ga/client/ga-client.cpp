@@ -159,7 +159,6 @@ static void create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 	h = rtspParam->height[ch];
 	format = rtspParam->format[ch];
 	pthread_mutex_unlock(&rtspParam->surfaceMutex[ch]);
-	// swsctx
 	if((swsctx = create_frame_converter(w, h, format, w, h, AV_PIX_FMT_YUV420P)) == NULL) {
 		rtsperror("ga-client: cannot create swsscale context.\n");
 		exit(-1);
@@ -218,7 +217,7 @@ static void create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		switch_grab_input(NULL);
 		SDL_SetRelativeMouseMode(SDL_TRUE);
-#endif		////
+#endif
 		ga_error("ga-client: relative mouse mode enabled.\n");
 	}
 #if 1	// only support SDL2
@@ -263,7 +262,7 @@ static void create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 			w, h);
 #endif
 	if(overlay == NULL) {
-		rtsperror("ga-client: create overlay (textuer) failed.\n");
+		rtsperror("ga-client: create overlay (texture) failed.\n");
 		exit(-1);
 	}
 	pthread_mutex_lock(&rtspParam->surfaceMutex[ch]);
@@ -286,7 +285,6 @@ static void create_overlay(struct RTSPThreadParam *rtspParam, int ch) {
 
 static void open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecoder) {
 	SDL_AudioSpec wanted, spec;
-	//
 	wanted.freq = rtspconf->audio_samplerate;
 	wanted.format = -1;
 	if(rtspconf->audio_device_format == AV_SAMPLE_FMT_S16) {
@@ -300,7 +298,6 @@ static void open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecod
 	wanted.samples = SDL_AUDIO_BUFFER_SIZE;
 	wanted.callback = audio_buffer_fill_sdl;
 	wanted.userdata = adecoder;
-	//
 	pthread_mutex_lock(&rtspParam->audioMutex);
 	if(rtspParam->audioOpened == true) {
 		pthread_mutex_unlock(&rtspParam->audioMutex);
@@ -311,9 +308,7 @@ static void open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecod
 		rtsperror("ga-client: open audio failed - %s\n", SDL_GetError());
 		return;
 	}
-	//
 	rtspParam->audioOpened = true;
-	//
 	SDL_PauseAudio(0);
 	pthread_mutex_unlock(&rtspParam->audioMutex);
 	rtsperror("ga-client: audio device opened.\n");
@@ -321,8 +316,7 @@ static void open_audio(struct RTSPThreadParam *rtspParam, AVCodecContext *adecod
 }
 
 // negative x or y means centering-x and centering-y, respectively
-static void
-render_text(SDL_Renderer *renderer, SDL_Window *window, int x, int y, int line, const char *text) {
+static void render_text(SDL_Renderer *renderer, SDL_Window *window, int x, int y, int line, const char *text) {
 #ifdef ANDROID
 	// not supported
 #else
@@ -659,10 +653,8 @@ static void * watchdog_thread(void *args) {
 		}
 		pthread_mutex_unlock(&watchdogMutex);
 	}
-	//
 	rtsperror("watchdog: terminated.\n");
 	exit(-1);
-	//
 	return NULL;
 }
 
@@ -856,7 +848,6 @@ int maintt(int argc, char *argv[]){
 }
 
 int main(int argc, char *argv[]) 
-//int main()
 {
 	int i;
 	SDL_Event event;
@@ -864,7 +855,6 @@ int main(int argc, char *argv[])
 	pthread_t ctrlthread;
 	pthread_t watchdog;
 	char savefile_keyts[128];
-	//
 #ifdef ANDROID
 	if(ga_init("/sdcard/ga/android.conf", NULL) < 0) {
 		rtsperror("cannot load configuration file '%s'\n", argv[1]);
@@ -875,7 +865,6 @@ int main(int argc, char *argv[])
 		rtsperror("usage: %s config url\n", argv[0]);
 		return -1;
 	}
-	//
 	if(ga_init(argv[1], argv[2]) < 0) {
 		rtsperror("cannot load configuration file '%s'\n", argv[1]);
 		return -1;
@@ -916,13 +905,12 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-	//
 	rtspconf_resolve_server(rtspconf, rtspconf->servername);
 	rtsperror("Remote server @ %s[%s]:%d\n",
 		rtspconf->servername,
 		inet_ntoa(rtspconf->sin.sin_addr),
 		rtspconf->serverport);
-	//
+	
 	if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		rtsperror("SDL init failed: %s\n", SDL_GetError());
 		return -1;
@@ -960,7 +948,6 @@ int main(int argc, char *argv[])
 	} else {
 		ga_error("watchdog disabled.\n");
 	}
-	//
 	bzero(&rtspThreadParam, sizeof(rtspThreadParam));
 	for(i = 0; i < VIDEO_SOURCE_CHANNEL_MAX; i++) {
 		pthread_mutex_init(&rtspThreadParam.surfaceMutex[i], NULL);
@@ -979,18 +966,15 @@ int main(int argc, char *argv[])
 			ProcessEvent(&event);
 		}
 	}
-	//
 	rtspThreadParam.quitLive555 = 1;
 	rtsperror("terminating ...\n");
-	//
 #ifndef ANDROID
 	pthread_cancel(rtspthread);
 	if(rtspconf->ctrlenable)
 		pthread_cancel(ctrlthread);
 	pthread_cancel(watchdog);
 #endif
-	//SDL_WaitThread(thread, &status);
-	//
+	//SDL_WaitThread(thread, &status);	
 	if(savefp_keyts != NULL) {
 		ga_save_close(savefp_keyts);
 		savefp_keyts = NULL;
@@ -998,7 +982,5 @@ int main(int argc, char *argv[])
 	SDL_Quit();
 	ga_deinit();
 	exit(0);
-	//
 	return 0;
 }
-

@@ -135,8 +135,7 @@ static int packet_queue_limit = 5;	// limit the queue size
 static int packet_queue_dropfactor = 2;	// default drop half
 static PacketQueue audioq;
 
-void
-packet_queue_init(PacketQueue *q) {
+void packet_queue_init(PacketQueue *q) {
 	int val;
 	char buf[8];
 	packet_queue_initialized = 1;
@@ -160,8 +159,7 @@ packet_queue_init(PacketQueue *q) {
 	return;
 }
 
-int
-packet_queue_put(PacketQueue *q, AVPacket *pkt) {
+int packet_queue_put(PacketQueue *q, AVPacket *pkt) {
 	if(av_dup_packet(pkt) < 0) {
 		rtsperror("packet queue put failed\n");
 		return -1;
@@ -218,8 +216,7 @@ packet_queue_get(PacketQueue *q, AVPacket *pkt, int block) {
 	return ret;
 }
 
-int
-packet_queue_drop(PacketQueue *q) {
+int packet_queue_drop(PacketQueue *q) {
 	int dropped, count = 0;
 	AVPacket pkt;
 	// dropping enabled?
@@ -248,18 +245,15 @@ packet_queue_drop(PacketQueue *q) {
 	return count;
 }
 
-UsageEnvironment&
-operator<<(UsageEnvironment& env, const RTSPClient& rtspClient) {
+UsageEnvironment& operator<<(UsageEnvironment& env, const RTSPClient& rtspClient) {
 	return env << "[URL:\"" << rtspClient.url() << "\"]: ";
 }
 
-UsageEnvironment&
-operator<<(UsageEnvironment& env, const MediaSubsession& subsession) {
+UsageEnvironment& operator<<(UsageEnvironment& env, const MediaSubsession& subsession) {
 	return env << subsession.mediumName() << "/" << subsession.codecName();
 }
 
-void
-rtsperror(const char *fmt, ...) {
+void rtsperror(const char *fmt, ...) {
 	static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 	va_list ap;
 	pthread_mutex_lock(&mutex);
@@ -337,8 +331,7 @@ decode_sprop(AVCodecContext *ctx, const char *sprop) {
 	return NULL;
 }
 
-int
-init_vdecoder(int channel, const char *sprop) {
+int init_vdecoder(int channel, const char *sprop) {
 	AVCodec *codec = NULL; 
 	AVCodecContext *ctx;
 	AVFrame *frame;
@@ -401,8 +394,7 @@ init_vdecoder(int channel, const char *sprop) {
 	return 0;
 }
 
-int
-init_adecoder() {
+int init_adecoder() {
 	AVCodec *codec = NULL;
 	AVCodecContext *ctx;
 	const char **names = NULL;
@@ -430,7 +422,6 @@ init_adecoder() {
 #ifdef ANDROID
 	}
 #endif
-	//
 	if((aframe = av_frame_alloc()) == NULL) {
 		rtsperror("audio decoder: allocate frame failed\n");
 		return -1;
@@ -453,7 +444,7 @@ init_adecoder() {
 	}
 	rtsperror("audio decoder: %d channels, samplerate %d\n",
 		(int) ctx->channels, (int) ctx->sample_rate);
-	//
+	
 	if(avcodec_open2(ctx, codec, NULL) != 0) {
 		rtsperror("audio decoder: cannot open decoder\n");
 		return -1;
@@ -464,7 +455,6 @@ init_adecoder() {
 }
 
 //// packet loss monitor
-
 typedef struct pktloss_record_s {
 	/* XXX: ssrc is 32-bit, and seqnum is 16-bit */
 	int reset;	/* 1 - this record should be reset */
@@ -476,14 +466,12 @@ typedef struct pktloss_record_s {
 
 static map<unsigned int, pktloss_record_t> _pktmap;
 
-int
-pktloss_monitor_init() {
+int pktloss_monitor_init() {
 	_pktmap.clear();
 	return 0;
 }
 
-void
-pktloss_monitor_update(unsigned int ssrc, unsigned short seqnum) {
+void pktloss_monitor_update(unsigned int ssrc, unsigned short seqnum) {
 	map<unsigned int, pktloss_record_t>::iterator mi;
 	if((mi = _pktmap.find(ssrc)) == _pktmap.end()) {
 		pktloss_record_t r;
@@ -509,8 +497,7 @@ pktloss_monitor_update(unsigned int ssrc, unsigned short seqnum) {
 	return;
 }
 
-void
-pktloss_monitor_reset(unsigned int ssrc) {
+void pktloss_monitor_reset(unsigned int ssrc) {
 	map<unsigned int, pktloss_record_t>::iterator mi;
 	if((mi = _pktmap.find(ssrc)) != _pktmap.end()) {
 		mi->second.reset = 1;
@@ -518,8 +505,7 @@ pktloss_monitor_reset(unsigned int ssrc) {
 	return;
 }
 
-int
-pktloss_monitor_get(unsigned int ssrc, int *count = NULL, int reset = 0) {
+int pktloss_monitor_get(unsigned int ssrc, int *count = NULL, int reset = 0) {
 	map<unsigned int, pktloss_record_t>::iterator mi;
 	if((mi = _pktmap.find(ssrc)) == _pktmap.end())
 		return -1;
@@ -530,8 +516,7 @@ pktloss_monitor_get(unsigned int ssrc, int *count = NULL, int reset = 0) {
 	return mi->second.lost;
 }
 
-//// bandwidth estimator
-
+//// bandwidth estimator 
 typedef struct bwe_record_s {
 	struct timeval initTime;
 	unsigned int framecount;

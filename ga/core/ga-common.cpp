@@ -519,9 +519,7 @@ ga_save_printf(FILE *fp, const char *fmt, ...) {
  * @param planes [in] Pointers to address of (3) planes [Y, U, and V].
  * @param linesize [in] Pointers to linesize.
  */
-EXPORT
-int
-ga_save_yuv420p(FILE *fp, int w, int h, unsigned char *planes[], int linesize[]) {
+EXPORT int ga_save_yuv420p(FILE *fp, int w, int h, unsigned char *planes[], int linesize[]) {
 	int i, j, wlen, written = 0;
 	int w2 = w/2;
 	int h2 = h/2;
@@ -547,12 +545,11 @@ ga_save_yuv420p(FILE *fp, int w, int h, unsigned char *planes[], int linesize[])
 			src += linesize[j];
 		}
 	}
-	//
 	if(written != expected) {
 		ga_error("save YUV (%dx%d): expected %d, save %d (frame may be corrupted)\n",
 			w, h, expected, written);
 	}
-	//
+	
 	fflush(fp);
 	return written;
 err_save_yuv:

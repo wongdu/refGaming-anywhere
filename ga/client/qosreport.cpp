@@ -28,19 +28,16 @@
 
 static UsageEnvironment *env = NULL;
 static TaskToken qos_task = NULL;
-//
 static int n_qrec = 0;
 static qos_record_t qrec[Q_MAX];
 static struct timeval qos_tv;
 
 static void qos_schedule();
 
-static void
-qos_report(void *clientData) {
+static void qos_report(void *clientData) {
 	int i;
 	struct timeval now;
-	long long elapsed;
-	//
+	long long elapsed;	
 	gettimeofday(&now, NULL);
 	elapsed = tvdiff_us(&now, &qos_tv);
 	for(i = 0; i < n_qrec; i++) {
@@ -67,7 +64,7 @@ qos_report(void *clientData) {
 			8000000.0*dKB/elapsed,
 			stats->jitter(),
 			qrec[i].rtpsrc->timestampFrequency());
-		//
+	
 		qrec[i].pkts_expected = pkts_expected;
 		qrec[i].pkts_received = pkts_received;
 		qrec[i].KB_received = KB_received;
@@ -78,8 +75,7 @@ qos_report(void *clientData) {
 	return;
 }
 
-static void
-qos_schedule() {
+static void qos_schedule() {
 	struct timeval now, timeout;
 	timeout.tv_sec = qos_tv.tv_sec;
 	timeout.tv_usec = qos_tv.tv_usec + QOS_INTERVAL_MS * 1000;
@@ -91,8 +87,7 @@ qos_schedule() {
 	return;
 }
 
-int
-qos_start() {
+int qos_start() {
 	if(env == NULL)
 		return -1;
 	if(n_qrec <= 0)
@@ -102,8 +97,7 @@ qos_start() {
 	return 0;
 }
 
-int
-qos_add_source(const char *prefix, RTPSource *rtpsrc) {
+int qos_add_source(const char *prefix, RTPSource *rtpsrc) {
 	if(n_qrec >= Q_MAX) {
 		ga_error("qos-measurement: too many channels (limit=%d).\n", Q_MAX);
 		return -1;
@@ -119,8 +113,7 @@ qos_add_source(const char *prefix, RTPSource *rtpsrc) {
 	return 0;
 }
 
-int
-qos_deinit() {
+int qos_deinit() {
 	if(env != NULL) {
 		env->taskScheduler().unscheduleDelayedTask(qos_task);
 	}
@@ -132,12 +125,10 @@ qos_deinit() {
 	return 0;
 }
 
-int
-qos_init(UsageEnvironment *ue) {
+int qos_init(UsageEnvironment *ue) {
 	env = ue;
 	n_qrec = 0;
 	bzero(qrec, sizeof(qrec));
 	ga_error("qos-measurement: initialized.\n");
 	return 0;
 }
-
