@@ -233,8 +233,9 @@ static void pdqHash256FromCImgContent(CImg<uint8_t>& input, Hash256& hash){
  * vsource_threadproc accepts no arguments
  */
 //int distanceThreshold = DEFAULT_PDQ_DISTANCE_THRESHOLD;
+static const int distanceThreshold = 16;
 //static const int distanceThreshold = 32;
-static const int distanceThreshold = 48;
+//static const int distanceThreshold = 48;
 static std::vector<std::pair<facebook::pdq::hashing::Hash256, std::string>> matches;
 
 static void * vsource_threadproc(void *arg) {
@@ -271,10 +272,26 @@ static void * vsource_threadproc(void *arg) {
 	token = frame_interval;
 
 	facebook::pdq::index::MIH256<std::string> mih;
-	if (process_file(".\\frame_rgba.jpg")){
+	//if (process_file(".\\frame_rgba.jpg")){//D:\ga_bin_son\Release\ 
+	//if (process_file("D:\\ga_bin_son\\Release\\frame_rgba.jpg")){
+	/*if (process_file("D:\\frame_rgba.jpg")){
 		mih.insert(pdqhash, "ref_pic_0");
 		bRefHash = true;
+	}*/
+	if (process_file("D:\\ref\\pink.jpg")){
+		mih.insert(pdqhash, "pink");
 	}
+	if (process_file("D:\\ref\\green.jpg")){
+		mih.insert(pdqhash, "green");
+	}
+	if (process_file("D:\\ref\\blue.jpg")){
+		mih.insert(pdqhash, "blue");
+	}
+	if (mih.size()==3){
+		bRefHash = true;
+	}
+
+	mih.dump();
 	
 	static unsigned int  saveNum = 0;
 	while(vsource_started != 0) {
@@ -351,12 +368,26 @@ static void * vsource_threadproc(void *arg) {
 			frame->imgbuf[idx + 2] = temp;
 		}
 #endif
-		/*saveNum++;
-		if (saveNum == 100){
-			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
-			colormap.permute_axes("YZCX");
-			colormap.save("frame.jpg");
-		}*/
+		//saveNum++;
+		//if (saveNum % 5==0){
+		//	CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
+		//	colormap.permute_axes("YZCX");
+
+		//	//std::string strFileName = "D:\\ga_bin_son\\Release\\";
+		//	std::string strFileName = "D:\\";
+		//	saveNum++;
+		//	char timebuf[32];
+		//	struct tm* tm;
+		//	time_t now = 0;
+		//	now = time(NULL);
+		//	tm = localtime(&now);
+		//	strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
+		//	strFileName += timebuf;
+		//	strFileName += std::to_string(saveNum);
+		//	strFileName += ".jpg";
+
+		//	colormap.save(strFileName.c_str());
+		//}
 		/*saveNum++;
 		if (saveNum == 100){
 			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
@@ -376,8 +407,8 @@ static void * vsource_threadproc(void *arg) {
 			mih.queryAll(currPdqhash, distanceThreshold, matches);
 			for (auto itm : matches){
 				ga_log("current hash is: \"%s\",distance is: %d \n", currPdqhash.format().c_str(), itm.first.hammingDistance(currPdqhash));
-				if (itm.first.hammingDistance(currPdqhash)<40){
-					std::string strFileName = "";
+				//if (itm.first.hammingDistance(currPdqhash)<48){
+					std::string strFileName = "D:\\ref\\";
 					saveNum++;
 					char timebuf[32];
 					struct tm* tm;
@@ -386,11 +417,11 @@ static void * vsource_threadproc(void *arg) {
 					tm = localtime(&now);
 					strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
 					strFileName += timebuf;
-					strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash));	
+					strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash)) + "_" + itm.second;
 					strFileName += ".jpg";
 					//colormap.save(strFileName.c_str());
-					//CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
-				}
+					CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
+			//	}
 			}
 			/*if (matches.size() > 0){
 
