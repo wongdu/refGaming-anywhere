@@ -60,19 +60,19 @@
 #ifdef strncpy
 #undef strncpy
 #endif
-#include "CImg.h"
+//#include "CImg.h"
 
-#include <index/mih.h>
-#include <io/hashio.h>
-#include <io/pdqio.h>
-#include <hashing\pdqhashing.h>
+//#include <index/mih.h>
+//#include <io/hashio.h>
+//#include <io/pdqio.h>
+//#include <hashing\pdqhashing.h>
 
 #define	SOURCES			1
 //#define	ENABLE_EMBED_COLORCODE	1	/* XXX: enabled at the filter, not here */
 
 using namespace std;
-using namespace cimg_library;
-using namespace facebook::pdq::hashing;
+//using namespace cimg_library;
+//using namespace facebook::pdq::hashing;
 
 static struct gaRect croprect;
 static struct gaRect *prect = NULL;
@@ -182,6 +182,7 @@ static int vsource_init(void *arg) {
 	return 0;
 }
 
+/*
 static Hash256 pdqhash;
 static bool bRefHash = false;
 static bool process_file(char* filename){
@@ -229,14 +230,15 @@ static void pdqHash256FromCImgContent(CImg<uint8_t>& input, Hash256& hash){
 	delete[] fullBuffer1;
 	delete[] fullBuffer2;
 }
+*/
 /*
  * vsource_threadproc accepts no arguments
  */
 //int distanceThreshold = DEFAULT_PDQ_DISTANCE_THRESHOLD;
-static const int distanceThreshold = 16;
+//static const int distanceThreshold = 16;
 //static const int distanceThreshold = 32;
 //static const int distanceThreshold = 48;
-static std::vector<std::pair<facebook::pdq::hashing::Hash256, std::string>> matches;
+//static std::vector<std::pair<facebook::pdq::hashing::Hash256, std::string>> matches;
 
 static void * vsource_threadproc(void *arg) {
 	int i;
@@ -271,14 +273,14 @@ static void * vsource_threadproc(void *arg) {
 	lastTv = initialTv;
 	token = frame_interval;
 
-	facebook::pdq::index::MIH256<std::string> mih;
+	//facebook::pdq::index::MIH256<std::string> mih;
 	//if (process_file(".\\frame_rgba.jpg")){//D:\ga_bin_son\Release\ 
 	//if (process_file("D:\\ga_bin_son\\Release\\frame_rgba.jpg")){
 	/*if (process_file("D:\\frame_rgba.jpg")){
 		mih.insert(pdqhash, "ref_pic_0");
 		bRefHash = true;
 	}*/
-	if (process_file("D:\\ref\\pink.jpg")){
+	/*if (process_file("D:\\ref\\pink.jpg")){
 		mih.insert(pdqhash, "pink");
 	}
 	if (process_file("D:\\ref\\green.jpg")){
@@ -286,14 +288,14 @@ static void * vsource_threadproc(void *arg) {
 	}
 	if (process_file("D:\\ref\\blue.jpg")){
 		mih.insert(pdqhash, "blue");
-	}
-	if (mih.size()==3){
+	}*/
+	/*if (mih.size()==3){
 		bRefHash = true;
-	}
+	}*/
 
-	mih.dump();
+	/*mih.dump();*/
 	
-	static unsigned int  saveNum = 0;
+	//static unsigned int  saveNum = 0;
 	while(vsource_started != 0) {
 		// encoder has not launched?
 		if(encoder_running() == 0) {
@@ -362,28 +364,29 @@ static void * vsource_threadproc(void *arg) {
 		// draw cursor
 #ifdef WIN32
 		ga_win32_draw_system_cursor(frame);	
-		for (int idx = 0; idx < frame->imgbufsize;idx+=4){
+		for (int idx = 0; idx < frame->imgbufsize; idx += 4){
 			unsigned char temp = frame->imgbuf[idx];
-			frame->imgbuf[idx] = frame->imgbuf[idx+2];
+			frame->imgbuf[idx] = frame->imgbuf[idx + 2];
 			frame->imgbuf[idx + 2] = temp;
 		}
 #endif
 		//saveNum++;
-		//if (saveNum % 5==0){
+		////if (saveNum % 5==0 && false){
+		//if (saveNum % 3 == 0){
 		//	CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
 		//	colormap.permute_axes("YZCX");
 
 		//	//std::string strFileName = "D:\\ga_bin_son\\Release\\";
-		//	std::string strFileName = "D:\\";
+		//	std::string strFileName = "D:\\ref\\";
 		//	saveNum++;
 		//	char timebuf[32];
 		//	struct tm* tm;
 		//	time_t now = 0;
 		//	now = time(NULL);
 		//	tm = localtime(&now);
-		//	strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
+		//	strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S", tm);
 		//	strFileName += timebuf;
-		//	strFileName += std::to_string(saveNum);
+		//	//strFileName += std::to_string(saveNum);
 		//	strFileName += ".jpg";
 
 		//	colormap.save(strFileName.c_str());
@@ -395,38 +398,38 @@ static void * vsource_threadproc(void *arg) {
 			colormap = colormap.get_shared_channels(0, 2);
 			colormap.save("frame.jpg");
 		}*/
-		if (bRefHash ){
-			CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
-			colormap.permute_axes("YZCX");
-			//CImg<> rgb = rgba.get_shared_channels(0,2);
-			colormap = colormap.get_shared_channels(0, 2);
-			//colormap.save("frame.jpg");
-			Hash256 currPdqhash;
-			pdqHash256FromCImgContent(colormap, currPdqhash);
-			matches.clear();
-			mih.queryAll(currPdqhash, distanceThreshold, matches);
-			for (auto itm : matches){
-				ga_log("current hash is: \"%s\",distance is: %d \n", currPdqhash.format().c_str(), itm.first.hammingDistance(currPdqhash));
-				//if (itm.first.hammingDistance(currPdqhash)<48){
-					std::string strFileName = "D:\\ref\\";
-					saveNum++;
-					char timebuf[32];
-					struct tm* tm;
-					time_t now = 0;
-					now = time(NULL);
-					tm = localtime(&now);
-					strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
-					strFileName += timebuf;
-					strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash)) + "_" + itm.second;
-					strFileName += ".jpg";
-					//colormap.save(strFileName.c_str());
-					CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
-			//	}
-			}
-			/*if (matches.size() > 0){
+		//if (bRefHash ){
+		//	CImg<unsigned char> colormap(frame->imgbuf, 4, frame->realwidth, frame->realheight);
+		//	colormap.permute_axes("YZCX");
+		//	//CImg<> rgb = rgba.get_shared_channels(0,2);
+		//	colormap = colormap.get_shared_channels(0, 2);
+		//	//colormap.save("frame.jpg");
+		//	Hash256 currPdqhash;
+		//	pdqHash256FromCImgContent(colormap, currPdqhash);
+		//	matches.clear();
+		//	mih.queryAll(currPdqhash, distanceThreshold, matches);
+		//	for (auto itm : matches){
+		//		ga_log("current hash is: \"%s\",distance is: %d \n", currPdqhash.format().c_str(), itm.first.hammingDistance(currPdqhash));
+		//		//if (itm.first.hammingDistance(currPdqhash)<48){
+		//			std::string strFileName = "D:\\ref\\";
+		//			saveNum++;
+		//			char timebuf[32];
+		//			struct tm* tm;
+		//			time_t now = 0;
+		//			now = time(NULL);
+		//			tm = localtime(&now);
+		//			strftime(timebuf, sizeof timebuf, "%Y%m%d_%H%M%S_", tm);
+		//			strFileName += timebuf;
+		//			strFileName += std::to_string(saveNum) + "_" + std::to_string(itm.first.hammingDistance(currPdqhash)) + "_" + itm.second;
+		//			strFileName += ".jpg";
+		//			//colormap.save(strFileName.c_str());
+		//			CImg<unsigned char>(frame->imgbuf, 4, frame->realwidth, frame->realheight).permute_axes("YZCX").save(strFileName.c_str());
+		//	//	}
+		//	}
+		//	/*if (matches.size() > 0){
 
-			}*/
-		}
+		//	}*/
+		//}
 
 		//gImgPts++;
 		frame->imgpts = tvdiff_us(&captureTv, &initialTv)/frame_interval;

@@ -55,7 +55,7 @@ unsigned increaseReceiveBufferTo(UsageEnvironment& env,
 #ifdef strncpy
 #undef strncpy
 #endif
-#include "CImg.h"
+//#include "CImg.h"
 
 using namespace std;
 
@@ -737,35 +737,38 @@ static int drop_video_frame(int ch/*channel*/, unsigned char *buffer, int bufsiz
 }
 
 static int processYuvData(const unsigned int size_x, const unsigned int size_y, unsigned char *planes[], int linesize[]){
-	if (size_x <= 0 || size_y <= 0 || planes == NULL || linesize == NULL){
-		return -1;	
-	}
-	cimg_library::CImg<unsigned char> YUV(size_x, size_y, 1, 3), UV(size_x / 2, size_y / 2, 1, 2);
-	YUV.get_shared_channel(0).fill(0);
+	//if (size_x <= 0 || size_y <= 0 || planes == NULL || linesize == NULL){
+	//	return -1;	
+	//}
+	//cimg_library::CImg<unsigned char> YUV(size_x, size_y, 1, 3), UV(size_x / 2, size_y / 2, 1, 2);
+	//YUV.get_shared_channel(0).fill(0);
 
-	unsigned char *pSrcY = planes[0];
-	memcpy((void*)YUV.data(), pSrcY, size_x*size_y);
-	UV.fill(0);
-	memcpy((void*)UV.data(), planes[1], (size_t)UV.size() / 2);
-	memcpy((void*)(UV.data() + (size_t)UV.size() / 2), planes[2], (size_t)UV.size() / 2);
+	//unsigned char *pSrcY = planes[0];
+	//memcpy((void*)YUV.data(), pSrcY, size_x*size_y);
+	//UV.fill(0);
+	//memcpy((void*)UV.data(), planes[1], (size_t)UV.size() / 2);
+	//memcpy((void*)(UV.data() + (size_t)UV.size() / 2), planes[2], (size_t)UV.size() / 2);
 
-	const unsigned char *ptrs1 = UV._data, *ptrs2 = UV.data(0, 0, 0, 1);
-	unsigned char *ptrd1 = YUV.data(0, 0, 0, 1), *ptrd2 = YUV.data(0, 0, 0, 2);
-	const unsigned int wd = YUV._width;
+	//const unsigned char *ptrs1 = UV._data, *ptrs2 = UV.data(0, 0, 0, 1);
+	//unsigned char *ptrd1 = YUV.data(0, 0, 0, 1), *ptrd2 = YUV.data(0, 0, 0, 2);
+	//const unsigned int wd = YUV._width;
 
-	cimg_forY(UV, y) {
-		cimg_forX(UV, x) {
-			const unsigned char U = *(ptrs1++), V = *(ptrs2++);
-			ptrd1[wd] = U; *(ptrd1)++ = U;
-			ptrd1[wd] = U; *(ptrd1)++ = U;
-			ptrd2[wd] = V; *(ptrd2)++ = V;
-			ptrd2[wd] = V; *(ptrd2)++ = V;
-		}
-		ptrd1 += wd; ptrd2 += wd;
-	}
+	//cimg_forY(UV, y) {
+	//	cimg_forX(UV, x) {
+	//		const unsigned char U = *(ptrs1++), V = *(ptrs2++);
+	//		ptrd1[wd] = U; *(ptrd1)++ = U;
+	//		ptrd1[wd] = U; *(ptrd1)++ = U;
+	//		ptrd2[wd] = V; *(ptrd2)++ = V;
+	//		ptrd2[wd] = V; *(ptrd2)++ = V;
+	//	}
+	//	ptrd1 += wd; ptrd2 += wd;
+	//}
 
-	//YUV.save("20201102.jpg");
-	//YUV.YCbCrtoRGB().save("20201103.jpg");
+	////YUV.save("20201102.jpg");
+	////YUV.YCbCrtoRGB().save("20201103.jpg");
+	//YUV.YCbCrtoRGB();
+	//YUV.spectrum();
+	//ga_error("*** FATAL %d.\n", YUV.spectrum());
 	return 0;
 }
 
@@ -921,13 +924,13 @@ static int play_video_priv(int ch/*channel*/, unsigned char *buffer, int bufsize
 					ga_save_printf(savefp_yuvts, "Frame #%08d: %u.%06u\n", fcount++, ftv.tv_sec, ftv.tv_usec);
 				}
 			}
-			static unsigned int numTemp = 0;
-			if (numTemp++==100){
-				//cimg_library::CImg<unsigned char> colormap(dstframe->data, 3, vframe[0]->width, vframe[0]->height);
-				//cimg_library::CImg<unsigned char> colormap((unsigned int)(vframe[0]->width), vframe[0]->height, 1, 3, dstframe->data);
-				//cimg_library::CImg<unsigned char> colormap(vframe[0]->width, vframe[0]->height, 1, 3, dstframe->data);
-				processYuvData(vframe[0]->width, vframe[0]->height, dstframe->data, dstframe->linesize);
-			}
+			//static unsigned int numTemp = 0;
+			//if (numTemp++==100){
+			//	//cimg_library::CImg<unsigned char> colormap(dstframe->data, 3, vframe[0]->width, vframe[0]->height);
+			//	//cimg_library::CImg<unsigned char> colormap((unsigned int)(vframe[0]->width), vframe[0]->height, 1, 3, dstframe->data);
+			//	//cimg_library::CImg<unsigned char> colormap(vframe[0]->width, vframe[0]->height, 1, 3, dstframe->data);
+			//	//processYuvData(vframe[0]->width, vframe[0]->height, dstframe->data, dstframe->linesize);
+			//}
 			dpipe_store(rtspParam->pipe[ch], data);
 			// request to render it
 #ifdef PRINT_LATENCY

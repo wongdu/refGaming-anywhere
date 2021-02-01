@@ -213,7 +213,8 @@ int main(int argc, char *argv[]) {
 	if(rtspconf_parse(rtspconf_global()) < 0){ 
 		return -1;
 	}
-
+	
+	Sleep(5*1000);
 	prect = NULL;
 	if(ga_crop_window(&rect, &prect) < 0) {
 		return -1;
