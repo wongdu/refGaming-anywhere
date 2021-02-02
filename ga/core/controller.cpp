@@ -458,7 +458,7 @@ tcp_again:
 
 		// handle message
 		if(ctrlsys_handle_message(buf+bufhead, msglen) != 0) {
-			// message has been handeled, do nothing
+			// message has been handled, do nothing
 		} else if(replay != NULL) {
 			replay(buf+bufhead, msglen);
 		} else if(ctrl_queue_write_msg(buf+bufhead, msglen) != msglen) {

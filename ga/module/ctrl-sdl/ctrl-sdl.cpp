@@ -339,12 +339,10 @@ static void sdlmsg_replay_native(sdlmsg_t *msg) {
 			//ga_error("sdl replayer: vk=%x scan=%x\n", in.ki.wVk, in.ki.wScan);
 			SendInput(1, &in, sizeof(in));
 		} else {
-		////////////////
 		ga_error("sdl replayer: undefined key scan=%u(%04x) key=%u(%04x) mod=%u(%04x) pressed=%d\n",
 			msgk->scancode, msgk->scancode,
 			msgk->sdlkey, msgk->sdlkey, msgk->sdlmod, msgk->sdlmod,
 			msgk->is_pressed);
-		////////////////
 		}
 		break;
 	case SDL_EVENT_MSGTYPE_MOUSEKEY:
@@ -708,8 +706,7 @@ int sdlmsg_replay(sdlmsg_t *msg) {
 void sdlmsg_replay_callback(void *msg, int msglen) {
 	sdlmsg_t *m = (sdlmsg_t*) msg;
 	if(msglen != ntohs(m->msgsize)/*sizeof(sdlmsg_t)*/) {
-		ga_error("message length mismatched. (%d != %d)\n",
-			msglen, ntohs(m->msgsize));
+		ga_error("message length mismatched. (%d != %d)\n",msglen, ntohs(m->msgsize));
 	}
 	sdlmsg_replay((sdlmsg_t*) msg);
 	return;
