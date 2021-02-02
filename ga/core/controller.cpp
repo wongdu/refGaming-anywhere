@@ -66,8 +66,7 @@ name_resolve(const char *hostname) {
 }
 
 // queue routines
-int
-ctrl_queue_init(int size, int maxunit) {
+int ctrl_queue_init(int size, int maxunit) {
 	qunit = maxunit + sizeof(struct queuemsg);
 	qsize = size - (size % qunit);
 	qhead = qtail = 0;
@@ -79,8 +78,7 @@ ctrl_queue_init(int size, int maxunit) {
 	return 0;
 }
 
-void
-ctrl_queue_free() {
+void ctrl_queue_free() {
 	pthread_mutex_lock(&queue_mutex);
 	if(qbuffer != NULL)
 		free(qbuffer);
@@ -89,8 +87,7 @@ ctrl_queue_free() {
 	pthread_mutex_unlock(&queue_mutex);
 }
 
-struct queuemsg *
-ctrl_queue_read_msg() {
+struct queuemsg * ctrl_queue_read_msg() {
 	struct queuemsg *msg;
 	//
 	pthread_mutex_lock(&queue_mutex);
@@ -106,7 +103,6 @@ ctrl_queue_read_msg() {
 		msg = (struct queuemsg *) (qbuffer + qhead);
 	}
 	pthread_mutex_unlock(&queue_mutex);
-	//
 	return msg;
 }
 
@@ -136,11 +132,9 @@ ctrl_queue_release_msg(struct queuemsg *msg) {
 	return;
 }
 
-int
-ctrl_queue_write_msg(void *msg, int msgsize) {
+int ctrl_queue_write_msg(void *msg, int msgsize) {
 	int nextpos;
 	struct queuemsg *qmsg;
-	//
 	if((msgsize + sizeof(struct queuemsg)) > qunit) {
 		ga_error("controller queue: msg size exceeded (%d > %d).\n",
 			msgsize + sizeof(struct queuemsg), qunit);
@@ -241,8 +235,7 @@ error:
 	return -1;
 }
 
-void*
-ctrl_client_thread(void *rtspconf) {
+void* ctrl_client_thread(void *rtspconf) {
 	struct RTSPConf *conf = (struct RTSPConf*) rtspconf;
 #ifdef ANDROID
 	static int drop = 0;
@@ -260,7 +253,7 @@ ctrl_client_thread(void *rtspconf) {
 		pthread_mutex_lock(&wakeup_mutex);
 		pthread_cond_wait(&wakeup, &wakeup_mutex);
 		pthread_mutex_unlock(&wakeup_mutex);
-		//
+	
 		while((qm = ctrl_queue_read_msg()) != NULL) {
 			int wlen;
 			if(qm->msgsize == 0) {
@@ -303,8 +296,7 @@ quit:
 	return NULL;
 }
 
-void
-ctrl_client_sendmsg(void *msg, int msglen) {
+void ctrl_client_sendmsg(void *msg, int msglen) {
 	if(ctrlenabled == false) {
 		ga_error("controller client-sendmsg: controller was disabled.\n");
 		return;
@@ -317,10 +309,7 @@ ctrl_client_sendmsg(void *msg, int msglen) {
 	return;
 }
 
-////////////////////////////////////////////////////////////////////
-
-int
-ctrl_server_init(struct RTSPConf *conf, const char *ctrlid) {
+int ctrl_server_init(struct RTSPConf *conf, const char *ctrlid) {
 	if(ctrl_socket_init(conf) < 0)
 		return -1;
 	myctrlid = strdup(ctrlid);
@@ -351,15 +340,13 @@ error:
 	return -1;
 }
 
-msgfunc
-ctrl_server_setreplay(msgfunc callback) {
+msgfunc ctrl_server_setreplay(msgfunc callback) {
 	msgfunc old = replay;
 	replay = callback;
 	return old;
 }
 
-void*
-ctrl_server_thread(void *rtspconf) {
+void* ctrl_server_thread(void *rtspconf) {
 	struct RTSPConf *conf = (struct RTSPConf*) rtspconf;
 	struct sockaddr_in csin, xsin;
 	int socket;
@@ -369,7 +356,6 @@ ctrl_server_thread(void *rtspconf) {
 	socklen_t csinlen, xsinlen;
 #endif
 	int clientaccepted = 0;
-	//
 	unsigned char buf[8192];
 	int bufhead, buflen;
 
@@ -388,7 +374,6 @@ restart:
 	// handle only one client
 	if(conf->ctrlproto == IPPROTO_TCP) {
 		struct ctrlhandshake *hh = (struct ctrlhandshake*) buf;
-		//
 		if((socket = accept(ctrlsocket, (struct sockaddr*) &csin, &csinlen)) < 0) {
 			ga_error("controller server-accept: %s.\n", strerror(errno));
 			goto restart;
@@ -418,17 +403,14 @@ restart:
 	}
 
 	buflen = 0;
-
 	while(true) {
 		int rlen, msglen;
-		//
 		bufhead = 0;
-		//
 		if(conf->ctrlproto == IPPROTO_TCP) {
 tcp_readmore:
 			if((rlen = recv(socket, (char*) buf+buflen, sizeof(buf)-buflen, 0)) <= 0) {
 				ga_error("controller server-read: %s\n", strerror(errno));
-				ga_error("controller server-thread: conenction closed.\n");
+				ga_error("controller server-thread: connection closed.\n");
 				close(socket);
 				goto restart;
 			}
@@ -458,9 +440,8 @@ tcp_again:
 			else
 				continue;
 		}
-		//
-		msglen = ntohs(*((unsigned short*) (buf + bufhead)));
-		//
+
+		msglen = ntohs(*((unsigned short*) (buf + bufhead)));	
 		if(msglen == 0) {
 			ga_error("controller server: WARNING - invalid message with size equal to zero!\n");
 			continue;
@@ -478,6 +459,7 @@ tcp_again:
 				continue;
 			}
 		}
+
 		// handle message
 		if(ctrlsys_handle_message(buf+bufhead, msglen) != 0) {
 			// message has been handeled, do nothing
@@ -498,14 +480,11 @@ tcp_again:
 	}
 
 	clientaccepted = 0;
-
 	goto restart;
-
 	return NULL;
 }
 
-int
-ctrl_server_readnext(void *msg, int msglen) {
+int ctrl_server_readnext(void *msg, int msglen) {
 	int ret;
 	struct queuemsg *qm;
 again:
@@ -535,8 +514,7 @@ static pthread_rwlock_t oreslock = PTHREAD_RWLOCK_INITIALIZER;
 static int output_width = -1;
 static int output_height = -1;
 
-void
-ctrl_server_set_output_resolution(int width, int height) {
+void ctrl_server_set_output_resolution(int width, int height) {
 	pthread_rwlock_wrlock(&oreslock);
 	output_width = width;
 	output_height = height;
@@ -544,8 +522,7 @@ ctrl_server_set_output_resolution(int width, int height) {
 	return;
 }
 
-void
-ctrl_server_set_resolution(int width, int height) {
+void ctrl_server_set_resolution(int width, int height) {
 	pthread_rwlock_wrlock(&reslock);
 	curr_width = width;
 	curr_height = height;
@@ -553,8 +530,7 @@ ctrl_server_set_resolution(int width, int height) {
 	return;
 }
 
-void
-ctrl_server_get_resolution(int *width, int *height) {
+void ctrl_server_get_resolution(int *width, int *height) {
 	pthread_rwlock_rdlock(&reslock);
 	*width = curr_width;
 	*height = curr_height;
@@ -562,8 +538,7 @@ ctrl_server_get_resolution(int *width, int *height) {
 	return;
 }
 
-void
-ctrl_server_get_scalefactor(double *fx, double *fy) {
+void ctrl_server_get_scalefactor(double *fx, double *fy) {
 	double rx, ry;
 	pthread_rwlock_rdlock(&reslock);
 	pthread_rwlock_rdlock(&oreslock);
@@ -577,4 +552,3 @@ ctrl_server_get_scalefactor(double *fx, double *fy) {
 	*fy = ry;
 	return;
 }
-

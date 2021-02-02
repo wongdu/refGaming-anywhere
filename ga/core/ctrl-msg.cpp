@@ -35,8 +35,7 @@ static ctrlsys_handler_t ctrlsys_handler_list[] = {
 	NULL	/* 2 = CTRL_MSGSYS_SUBTYPE_NETREPORT */
 };
 
-ctrlsys_handler_t
-ctrlsys_set_handler(unsigned char subtype, ctrlsys_handler_t handler) {
+ctrlsys_handler_t ctrlsys_set_handler(unsigned char subtype, ctrlsys_handler_t handler) {
 	ctrlsys_handler_t old_handler = NULL;
 	if(subtype > CTRL_MSGSYS_SUBTYPE_MAX)
 		return NULL;
@@ -55,8 +54,7 @@ ctrlsys_set_handler(unsigned char subtype, ctrlsys_handler_t handler) {
  * This function also checks if the size of the message is correct.
  * It returns -1 if the size for the message is incorrect.
  */
-static int 
-ctrlsys_ntoh(ctrlmsg_system_t *msg) {
+static int ctrlsys_ntoh(ctrlmsg_system_t *msg) {
 	ctrlmsg_system_netreport_t *netreport;
 	msg->msgsize = ntohs(msg->msgsize);
 	switch(msg->subtype) {
@@ -87,8 +85,7 @@ ctrlsys_ntoh(ctrlmsg_system_t *msg) {
  * @param [in] msg Pointer to the message.
  * @return 1 if the message is a known control message, or 0 if it is not.
  */
-int
-ctrlsys_handle_message(unsigned char *buf, unsigned int size) {
+int ctrlsys_handle_message(unsigned char *buf, unsigned int size) {
 	ctrlmsg_system_t *msg = (ctrlmsg_system_t*) buf;
 	if(msg == NULL)
 		return 1;
