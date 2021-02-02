@@ -96,7 +96,7 @@ static struct gaRect croprect;
 #define	SDLK_KP7	SDLK_KP_7
 #define	SDLK_KP8	SDLK_KP_8
 #define	SDLK_KP9	SDLK_KP_9
-//
+
 #define SDLK_NUMLOCK	SDLK_NUMLOCKCLEAR
 #define SDLK_SCROLLOCK	SDLK_SCROLLLOCK
 #define SDLK_RMETA	SDLK_RGUI
@@ -108,8 +108,7 @@ static struct gaRect croprect;
 #define SDLK_BREAK	SDLK_PRINTSCREEN
 #endif
 
-sdlmsg_t *
-sdlmsg_ntoh(sdlmsg_t *msg) {
+sdlmsg_t * sdlmsg_ntoh(sdlmsg_t *msg) {
 	sdlmsg_keyboard_t *msgk = (sdlmsg_keyboard_t*) msg;
 	sdlmsg_mouse_t *msgm = (sdlmsg_mouse_t*) msg;
 	if(msg == NULL)
@@ -145,8 +144,7 @@ sdlmsg_ntoh(sdlmsg_t *msg) {
 	return msg;
 }
 
-sdlmsg_t *
-sdlmsg_keyboard(sdlmsg_t *msg, unsigned char pressed, unsigned short scancode, SDL_Keycode key, unsigned short mod, unsigned int unicode)
+sdlmsg_t * sdlmsg_keyboard(sdlmsg_t *msg, unsigned char pressed, unsigned short scancode, SDL_Keycode key, unsigned short mod, unsigned int unicode)
 {
 	sdlmsg_keyboard_t *msgk = (sdlmsg_keyboard_t*) msg;
 	//ga_error("sdl client: key event code=%x key=%x mod=%x pressed=%u\n", scancode, key, mod, pressed);
@@ -163,8 +161,7 @@ sdlmsg_keyboard(sdlmsg_t *msg, unsigned char pressed, unsigned short scancode, S
 	return msg;
 }
 
-sdlmsg_t *
-sdlmsg_mousekey(sdlmsg_t *msg, unsigned char pressed, unsigned char button, unsigned short x, unsigned short y) {
+sdlmsg_t * sdlmsg_mousekey(sdlmsg_t *msg, unsigned char pressed, unsigned char button, unsigned short x, unsigned short y) {
 	sdlmsg_mouse_t *msgm = (sdlmsg_mouse_t*) msg;
 	//ga_error("sdl client: button event btn=%u pressed=%u\n", button, pressed);
 	bzero(msg, sizeof(sdlmsg_mouse_t));
@@ -191,8 +188,7 @@ sdlmsg_mousewheel(sdlmsg_t *msg, unsigned short mousex, unsigned short mousey) {
 }
 #endif
 
-sdlmsg_t *
-sdlmsg_mousemotion(sdlmsg_t *msg, unsigned short mousex, unsigned short mousey, unsigned short relx, unsigned short rely, unsigned char state, int relativeMouseMode) {
+sdlmsg_t * sdlmsg_mousemotion(sdlmsg_t *msg, unsigned short mousex, unsigned short mousey, unsigned short relx, unsigned short rely, unsigned char state, int relativeMouseMode) {
 	sdlmsg_mouse_t *msgm = (sdlmsg_mouse_t*) msg;
 	//ga_error("sdl client: motion event x=%u y=%u\n", mousex, mousey);
 	bzero(msg, sizeof(sdlmsg_mouse_t));
@@ -207,11 +203,10 @@ sdlmsg_mousemotion(sdlmsg_t *msg, unsigned short mousex, unsigned short mousey, 
 	return msg;
 }
 
-int
-sdlmsg_replay_init(void *arg) {
+int sdlmsg_replay_init(void *arg) {
 	struct gaRect *rect = (struct gaRect*) arg;
 	struct RTSPConf *conf = rtspconf_global();
-	//
+	
 	if(keyblock_initialized == false) {
 		sdlmsg_kb_init();
 		keyblock_initialized = true;
@@ -233,9 +228,8 @@ sdlmsg_replay_init(void *arg) {
 	} else {
 		prect = NULL;
 	}
-	//
 	ga_error("sdl_replayer: sizeof(sdlmsg) = %d\n", sizeof(sdlmsg_t));
-	//
+
 #ifdef WIN32
 	cxsize = GetSystemMetrics(SM_CXSCREEN);
 	cysize = GetSystemMetrics(SM_CYSCREEN);
@@ -269,13 +263,13 @@ sdlmsg_replay_init(void *arg) {
 			conf->display);
 		return -1;
 	}
-	//
+
 	screenNumber = XDefaultScreen(display);
 	cxsize = XDisplayWidth(display, screenNumber);
 	cysize = XDisplayHeight(display, screenNumber);
 	ctrl_server_set_resolution(cxsize, cysize);
 	ctrl_server_set_output_resolution(cxsize, cysize);
-	//
+	
 	if(XTestQueryExtension(display, &evtbase, &errbase, &major, &minor) == False) {
 		ga_error("sdl replayer: XTest not supported.\n");
 		return -1;
@@ -290,11 +284,11 @@ sdlmsg_replay_init(void *arg) {
 		int baseX, baseY;
 		if(ga_conf_readints("output-resolution", resolution, 2) != 2)
 			break;
-		//
+
 		outputW = resolution[0];
 		outputH = resolution[1];
 		ctrl_server_set_output_resolution(outputW, outputH);
-		//
+	
 		if(rect == NULL) {
 			baseX = cxsize;
 			baseY = cysize;
@@ -304,18 +298,17 @@ sdlmsg_replay_init(void *arg) {
 		}
 		ctrl_server_set_resolution(baseX, baseY);
 		ctrl_server_get_scalefactor(&scaleFactorX, &scaleFactorY);
-		//
+		
 		ga_error("sdl replayer: mouse coordinate scale factor = (%.3f,%.3f)\n",
 			scaleFactorX, scaleFactorY);
 	} while(0);
 	// register callbacks
 	ctrl_server_setreplay(sdlmsg_replay_callback);
-	//
+	
 	return 0;
 }
 
-int
-sdlmsg_replay_deinit(void *arg) {
+int sdlmsg_replay_deinit(void *arg) {
 #ifdef WIN32
 #elif defined __APPLE__
 #elif defined ANDROID
@@ -329,8 +322,7 @@ sdlmsg_replay_deinit(void *arg) {
 }
 
 #ifdef WIN32
-static void
-sdlmsg_replay_native(sdlmsg_t *msg) {
+static void sdlmsg_replay_native(sdlmsg_t *msg) {
 	INPUT in;
 	sdlmsg_keyboard_t *msgk = (sdlmsg_keyboard_t*) msg;
 	sdlmsg_mouse_t *msgm = (sdlmsg_mouse_t*) msg;
@@ -446,14 +438,12 @@ sdlmsg_replay_native(sdlmsg_t *msg) {
 }
 #elif defined __APPLE__
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-static void
-sdlmsg_replay_native(sdlmsg_t *msg) {
+static void sdlmsg_replay_native(sdlmsg_t *msg) {
     // server codes do not support android
     return;
 }
 #else
-static void
-sdlmsg_replay_native(sdlmsg_t *msg) {
+static void sdlmsg_replay_native(sdlmsg_t *msg) {
 	// read: CGEventCreateMouseEvent()
 	//	 CGEventCreateKeyboardEvent()
 	//	 CGEventPost()
@@ -545,14 +535,12 @@ sdlmsg_replay_native(sdlmsg_t *msg) {
 }
 #endif
 #elif defined ANDROID
-static void
-sdlmsg_replay_native(sdlmsg_t *msg) {
+static void sdlmsg_replay_native(sdlmsg_t *msg) {
 	// server codes do not support android
 	return;
 }
 #else	// X11
-static void
-sdlmsg_replay_native(sdlmsg_t *msg) {
+static void sdlmsg_replay_native(sdlmsg_t *msg) {
 	static KeyCode kcode;
 	static KeySym ksym;
 	sdlmsg_keyboard_t *msgk = (sdlmsg_keyboard_t*) msg;
@@ -635,11 +623,10 @@ sdlmsg_replay_native(sdlmsg_t *msg) {
 }
 #endif
 
-int
-sdlmsg_kb_init() {
+int sdlmsg_kb_init() {
 	char keybuf[64], valbuf[64];
 	char *key, *val;
-	//
+
 	kbScancode.clear();
 	kbSdlkey.clear();
 	// load scancodes
@@ -647,16 +634,13 @@ sdlmsg_kb_init() {
 		ga_conf_mapreset("key-block-scancode");
 		for(	key = ga_conf_mapkey("key-block-scancode", keybuf, sizeof(keybuf));
 			key != NULL;
-			key = ga_conf_mapnextkey("key-block-scancode", keybuf, sizeof(keybuf))) {
-			//
+			key = ga_conf_mapnextkey("key-block-scancode", keybuf, sizeof(keybuf))) {		
 			unsigned short sc = strtol(key, NULL, 0);
 			if(sc == 0)
 				continue;
-			//
 			val = ga_conf_mapvalue("key-block-scancode", valbuf, sizeof(valbuf));
 			if(val == NULL)
-				continue;
-			//
+				continue;		
 			if(ga_conf_boolval(val, 0) != 0)
 				kbScancode[sc] = 1;
 		}
@@ -667,23 +651,20 @@ sdlmsg_kb_init() {
 		for(	key = ga_conf_mapkey("key-block-keycode", keybuf, sizeof(keybuf));
 			key != NULL;
 			key = ga_conf_mapnextkey("key-block-keycode", keybuf, sizeof(keybuf))) {
-			//
 			unsigned short kc = strtol(key, NULL, 0);
 			if(kc == 0)
 				continue;
-			//
 			val = ga_conf_mapvalue("key-block-keycode", valbuf, sizeof(valbuf));
 			if(val == NULL)
 				continue;
-			//
+		
 			if(ga_conf_boolval(val, 0) != 0)
 				kbSdlkey[kc] = 1;
 		}
 	}
-	//
 	ga_error("key-blocking initialized: %u+%u keys blocked.\n",
 		kbScancode.size(), kbSdlkey.size());
-	//
+	
 	return 0;
 }
 
@@ -692,15 +673,13 @@ GEN_KB_ADD_FUNC(int, sdlkey, kbSdlkey)
 GEN_KB_MATCH_FUNC(unsigned short, scancode, kbScancode)
 GEN_KB_MATCH_FUNC(int, sdlkey, kbSdlkey)
 
-int
-sdlmsg_key_blocked(sdlmsg_t *msg) {
+int sdlmsg_key_blocked(sdlmsg_t *msg) {
 	sdlmsg_keyboard_t *msgk;
 	if(msg->msgtype != SDL_EVENT_MSGTYPE_KEYBOARD) {
 		return 0;
 	}
-	//
-	msgk = (sdlmsg_keyboard_t*) msg;
-	//
+	
+	msgk = (sdlmsg_keyboard_t*) msg;	
 	if(sdlmsg_kb_match_scancode(msgk->scancode)) {
 		return 1;
 	}
@@ -710,8 +689,7 @@ sdlmsg_key_blocked(sdlmsg_t *msg) {
 	return 0;
 }
 
-int
-sdlmsg_replay(sdlmsg_t *msg) {
+int sdlmsg_replay(sdlmsg_t *msg) {
 	// convert from network byte order to host byte order
 	sdlmsg_ntoh(msg);
 	if(sdlmsg_key_blocked(msg)) {
@@ -721,8 +699,7 @@ sdlmsg_replay(sdlmsg_t *msg) {
 	return 0;
 }
 
-void
-sdlmsg_replay_callback(void *msg, int msglen) {
+void sdlmsg_replay_callback(void *msg, int msglen) {
 	sdlmsg_t *m = (sdlmsg_t*) msg;
 	if(msglen != ntohs(m->msgsize)/*sizeof(sdlmsg_t)*/) {
 		ga_error("message length mismatched. (%d != %d)\n",
@@ -732,13 +709,10 @@ sdlmsg_replay_callback(void *msg, int msglen) {
 	return;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
 #ifdef WIN32
-static void
-SDLKeyToKeySym_init() {
+static void SDLKeyToKeySym_init() {
 	unsigned short i;
-	//
+	
 	keymap[SDLK_BACKSPACE]	= VK_BACK;		//		= 8,
 	keymap[SDLK_TAB]	= VK_TAB;		//		= 9,
 	keymap[SDLK_CLEAR]	= VK_CLEAR;		//		= 12,
@@ -877,8 +851,7 @@ SDLKeyToKeySym_init() {
     return;
 }
 #else
-static void
-SDLKeyToKeySym_init() {
+static void SDLKeyToKeySym_init() {
 	// read: /System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/HIToolbox.framework/Versions/A/Headers/Events.h
 	unsigned short i;
 	//
@@ -1042,14 +1015,12 @@ SDLKeyToKeySym_init() {
 }
 #endif
 #elif defined ANDROID
-static void
-SDLKeyToKeySym_init() {
+static void SDLKeyToKeySym_init() {
 	// server codes do not support android
 	return;
 }
 #else // X11
-static void
-SDLKeyToKeySym_init() {
+static void SDLKeyToKeySym_init() {
 	unsigned short i;
 	//
 	keymap[SDLK_BACKSPACE]	= XK_BackSpace;		//		= 8,
@@ -1139,14 +1110,13 @@ SDLKeyToKeySym_init() {
 	SDLK_EURO		= 321,		/**< Some european keyboards */
 #endif
 	keymap[SDLK_UNDO]	= XK_Undo;	//		= 322,		/**< Atari keyboard has Undo */
-	//
+
 	keymap_initialized = true;
 	return;
 }
 #endif
 
-static KeySym
-SDLKeyToKeySym(int sdlkey) {
+static KeySym SDLKeyToKeySym(int sdlkey) {
 	map<int, KeySym>::iterator mi;
 	if(keymap_initialized == false) {
 		SDLKeyToKeySym_init();
@@ -1158,8 +1128,7 @@ SDLKeyToKeySym(int sdlkey) {
 }
 
 #ifdef GA_MODULE
-ga_module_t *
-module_load() {
+ga_module_t * module_load() {
 	static ga_module_t m;
 	bzero(&m, sizeof(m));
 	m.type = GA_MODULE_TYPE_CONTROL;
@@ -1169,4 +1138,3 @@ module_load() {
 	return &m;
 }
 #endif
-

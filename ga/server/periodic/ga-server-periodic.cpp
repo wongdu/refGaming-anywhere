@@ -247,4 +247,3 @@ int main(int argc, char *argv[]) {
 	ga_deinit();
 	return 0;
 }
-

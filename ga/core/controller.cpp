@@ -89,7 +89,6 @@ void ctrl_queue_free() {
 
 struct queuemsg * ctrl_queue_read_msg() {
 	struct queuemsg *msg;
-	//
 	pthread_mutex_lock(&queue_mutex);
 	if(qbuffer == NULL) {
 		pthread_mutex_unlock(&queue_mutex);
@@ -106,8 +105,7 @@ struct queuemsg * ctrl_queue_read_msg() {
 	return msg;
 }
 
-void
-ctrl_queue_release_msg(struct queuemsg *msg) {
+void ctrl_queue_release_msg(struct queuemsg *msg) {
 	struct queuemsg *currmsg;
 	pthread_mutex_lock(&queue_mutex);
 	if(qbuffer == NULL) {
@@ -172,8 +170,6 @@ void ctrl_queue_clear() {
 	qhead = qtail = 0;
 	pthread_mutex_unlock(&queue_mutex);
 }
-
-////////////////////////////////////////////////////////////////////
 
 int ctrl_socket_init(struct RTSPConf *conf) {
 	if(conf->ctrlproto == IPPROTO_TCP) {
