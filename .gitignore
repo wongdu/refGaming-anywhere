@@ -43,3 +43,5 @@ ga/vs2013/Debug/*.dll
 ga/vs2013/Debug/mod/*.dll
 *.dll.recipe
 *.exe.recipe
+*.iobj
+*.ipdb
