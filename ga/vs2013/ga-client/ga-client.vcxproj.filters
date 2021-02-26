@@ -28,6 +28,60 @@
     <Filter Include="io">
       <UniqueIdentifier>{584ed37c-8bfe-4e39-a883-760825af2008}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{c91783bd-128b-4db1-a246-9b0ea52c22ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\strings">
+      <UniqueIdentifier>{bb7a5ea0-f19b-4733-b2f5-e04da2111067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\threading">
+      <UniqueIdentifier>{f62894f7-bd88-4d92-9c8d-937b7d73eabd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\message_loop">
+      <UniqueIdentifier>{b7de9c61-7024-4821-8514-1b5aaccb94a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\win">
+      <UniqueIdentifier>{ecc1ce85-39e3-4af2-88c5-26e28126bc70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto">
+      <UniqueIdentifier>{0035de25-c917-46e3-8e71-ec417be73584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\crypto">
+      <UniqueIdentifier>{28f11974-f9fd-4e83-8a63-c4265c74cdc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\memory">
+      <UniqueIdentifier>{20055e69-c916-4184-a201-ab4ce2549bdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\net">
+      <UniqueIdentifier>{475f8054-f950-4c39-a888-374a9fe4ba3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{f6d626b2-b161-49a1-83e2-d68fc8e7b142}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\peer">
+      <UniqueIdentifier>{ad737781-bcd4-493b-989b-94232d932789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common_">
+      <UniqueIdentifier>{c1a4b2e5-5a34-4a19-962c-b5e93ac15aab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\audio">
+      <UniqueIdentifier>{7a0d126e-bdfd-4548-bffa-4c3adee3b9d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\codec">
+      <UniqueIdentifier>{fbf4eceb-04e9-4a26-89a5-de46dc4f2647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\settings">
+      <UniqueIdentifier>{d1dc6115-77bc-4e30-82dc-51363c16f3d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\files">
+      <UniqueIdentifier>{69f58b29-ed1d-4494-b62f-ddecfd75f675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\ipc">
+      <UniqueIdentifier>{0ea618e7-8c4c-4bcb-9e4e-267e6348dbc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\desktop">
+      <UniqueIdentifier>{11409998-41b9-423e-85a3-63b5738e9e05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\client\ctrl-sdl.cpp">
@@ -68,6 +122,462 @@
     </ClCompile>
     <ClCompile Include="..\..\client\io\pdqio.cpp">
       <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\logging.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\scoped_clear_last_error.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\unicode.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\debug.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\endian_util.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\system_error.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_printf.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\strcat.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_number_conversions.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_split.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_util.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_util_constants.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\system_time.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\threading\simple_thread.cc">
+      <Filter>net\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\threading\thread.cc">
+      <Filter>net\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\threading\thread_checker.cc">
+      <Filter>net\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\message_loop.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\message_loop_task_runner.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_asio.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_default.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\pending_task.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_win.cc">
+      <Filter>net\message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\scoped_com_initializer.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\desktop.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\drive_enumerator.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\file_version_info.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\message_window.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\object_watcher.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\printer_enumerator.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\process_util.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\registry.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\resource_util.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\scoped_clipboard.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\scoped_impersonator.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\scoped_thread_desktop.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\security_helpers.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\service.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\service_controller.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\session_enumerator.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\session_info.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\session_status.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\session_watcher.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\win\windows_version.cc">
+      <Filter>net\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\common.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\command_line.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\strings\string_util_win.cc">
+      <Filter>net\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\big_num.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\data_cryptor_chacha20_poly1305.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\data_cryptor_fake.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\generic_hash.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\key_pair.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\large_number_increment.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\message_decryptor_fake.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\message_decryptor_openssl.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\message_encryptor_fake.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\message_encryptor_openssl.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\openssl_util.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\password_generator.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\password_hash.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\random.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\scoped_crypto_initializer.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\secure_memory.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\srp_constants.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\srp_math.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\memory\aligned_memory.cc">
+      <Filter>net\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\memory\byte_array.cc">
+      <Filter>net\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\version.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\address.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\ip_util.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\network_channel.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\network_channel_proxy.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\network_server.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\tcp_keep_alive.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\net\variable_size.cc">
+      <Filter>net\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\location.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\client.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\client_config.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\client_desktop.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\client_file_transfer.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\client_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\desktop_control_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\desktop_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_control_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_manager_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_remove_queue_builder.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_remove_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_remover.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_remover_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_transfer.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_transfer_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_transfer_queue_builder.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\file_transfer_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\input_event_filter.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router_config.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router_config_storage.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router_controller.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\router_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\status_window_proxy.cc">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\desktop.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\desktop_extensions.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\file_transfer.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\key_exchange.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\router_admin.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\router_common.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\router_peer.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\system_info.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\authenticator.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\client_authenticator.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\host_id.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\relay_peer.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\relay_peer_manager.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\user.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\peer\user_list.cc">
+      <Filter>net\peer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\relay_peer.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\clipboard.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\clipboard_monitor.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\desktop_session_constants.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_depacketizer.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_packetizer.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_task.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_task_consumer_proxy.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_task_factory.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_task_producer_proxy.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_worker.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\audio\audio_capturer.cc">
+      <Filter>net\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\audio\audio_silence_detector.cc">
+      <Filter>net\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\audio\audio_volume_filter.cc">
+      <Filter>net\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\proto\desktop_internal.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\common\file_enumerator_win.cc">
+      <Filter>common_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\waitable_timer.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\cpuid_util.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\settings\json_settings.cc">
+      <Filter>net\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\settings\settings.cc">
+      <Filter>net\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\settings\xml_settings.cc">
+      <Filter>net\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\xml_sax_writer.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\files\base_paths.cc">
+      <Filter>net\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\files\file_path_watcher.cc">
+      <Filter>net\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\files\file_util.cc">
+      <Filter>net\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\files\scoped_temp_file.cc">
+      <Filter>net\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\ipc\shared_memory.cc">
+      <Filter>net\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\ipc\shared_memory_factory.cc">
+      <Filter>net\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\ipc\shared_memory_factory_proxy.cc">
+      <Filter>net\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\crypto\os_crypt_win.cc">
+      <Filter>net\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\sys_info.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\sys_info_win.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\task_runner.cc">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\codec\cursor_decoder.cc">
+      <Filter>net\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\desktop\mouse_cursor.cc">
+      <Filter>net\desktop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\base\codec\scoped_zstd_stream.cc">
+      <Filter>net\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\client\config_factory.cc">
+      <Filter>client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +625,546 @@
     </ClInclude>
     <ClInclude Include="..\..\client\CImg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\logging.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\scoped_clear_last_error.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\unicode.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\debug.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\endian_util.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\system_error.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\string_printf.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\strcat.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\string_number_conversions.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\string_split.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\string_util.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\strings\string_util_constants.h">
+      <Filter>net\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\system_time.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\threading\simple_thread.h">
+      <Filter>net\threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\threading\thread.h">
+      <Filter>net\threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\threading\thread_checker.h">
+      <Filter>net\threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_loop.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_loop_task_runner.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_pump.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_asio.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_default.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_dispatcher.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\pending_task.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_win.h">
+      <Filter>net\message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_com_initializer.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\desktop.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\drive_enumerator.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\file_version_info.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\message_window.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\object_watcher.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\printer_enumerator.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\process_util.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\registry.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\resource_util.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_clipboard.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_co_mem.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_gdi_object.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_hdc.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_hglobal.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_impersonator.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_local.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_object.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_select_object.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_thread_desktop.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_user_object.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\scoped_wts_memory.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\security_helpers.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\service.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\service_controller.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\session_enumerator.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\session_info.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\session_status.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\session_watcher.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\win\windows_version.h">
+      <Filter>net\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\common.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\command_line.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\big_num.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor_chacha20_poly1305.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor_fake.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\generic_hash.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\key_pair.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\large_number_increment.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor_fake.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor_openssl.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor_fake.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor_openssl.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\openssl_util.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\os_crypt.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\password_generator.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\password_hash.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\random.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\scoped_crypto_initializer.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\secure_memory.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\srp_constants.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\crypto\srp_math.h">
+      <Filter>net\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\memory\aligned_memory.h">
+      <Filter>net\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\memory\byte_array.h">
+      <Filter>net\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\memory\typed_buffer.h">
+      <Filter>net\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\version.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\address.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\ip_util.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\network_channel.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\network_channel_proxy.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\network_server.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\tcp_keep_alive.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\variable_size.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\net\write_task.h">
+      <Filter>net\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\location.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\client.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\client_config.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\client_desktop.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\client_file_transfer.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\client_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\desktop_control.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\desktop_control_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\desktop_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\desktop_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_control.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_control_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_manager_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_manager_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_remove_queue_builder.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_remove_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_remove_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_remover.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_remover_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_transfer.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_transfer_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_transfer_queue_builder.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_transfer_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\file_transfer_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\frame_factory.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\input_event_filter.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_config.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_config_storage.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_controller.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\router_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\status_window.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\status_window_proxy.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\desktop.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\desktop_extensions.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\file_transfer.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\key_exchange.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\router_admin.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\router_common.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\router_peer.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\system_info.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\authenticator.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\client_authenticator.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\host_id.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\relay_peer.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\relay_peer_manager.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\user.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\user_list.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\peer\user_list_base.h">
+      <Filter>net\peer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\relay_peer.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\clipboard.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\clipboard_monitor.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\desktop_session_constants.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_depacketizer.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_enumerator.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_packet.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_packetizer.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_platform_util.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task_consumer.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task_consumer_proxy.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task_factory.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task_producer.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_task_producer_proxy.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\common\file_worker.h">
+      <Filter>common_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\audio\audio_capturer.h">
+      <Filter>net\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\audio\audio_silence_detector.h">
+      <Filter>net\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\audio\audio_volume_filter.h">
+      <Filter>net\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\proto\desktop_internal.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\waitable_timer.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\cpuid_util.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\settings\json_settings.h">
+      <Filter>net\settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\settings\settings.h">
+      <Filter>net\settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\settings\xml_settings.h">
+      <Filter>net\settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\xml_sax_writer.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\files\base_paths.h">
+      <Filter>net\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\files\file_path_watcher.h">
+      <Filter>net\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\files\file_util.h">
+      <Filter>net\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\files\scoped_temp_file.h">
+      <Filter>net\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\ipc\shared_memory.h">
+      <Filter>net\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\ipc\shared_memory_factory.h">
+      <Filter>net\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\ipc\shared_memory_factory_proxy.h">
+      <Filter>net\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\sys_info.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\task_runner.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\codec\cursor_decoder.h">
+      <Filter>net\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\desktop\mouse_cursor.h">
+      <Filter>net\desktop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\base\codec\scoped_zstd_stream.h">
+      <Filter>net\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\client\config_factory.h">
+      <Filter>client</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -27,7 +27,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -73,13 +73,14 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;..\..\client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;NO_OPENSSL;__STDC_LIMIT_MACROS;HAVE_STRUCT_TIMESPEC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;..\..\..\deps.win32\include\zstd;..\..\client;..\..\client\base;C:\Boost\include\boost-1_75;C:\Boost\include\boost-1_75\boost;..\..\..\deps.win32\include\protobuf-3.2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;NO_OPENSSL;__STDC_LIMIT_MACROS;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\deps.win32\lib;$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libga.lib;ws2_32.lib;libliveMedia_d.lib;libgroupsock_d.lib;libBasicUsageEnvironment_d.lib;libUsageEnvironment_d.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Psapi.lib;libga.lib;ws2_32.lib;libliveMedia_d.lib;libgroupsock_d.lib;libBasicUsageEnvironment_d.lib;libUsageEnvironment_d.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;pthreadVC2.lib;libprotobufd.lib;libprotobuf-lited.lib;Wtsapi32.lib;Version.lib;libssl.lib;libcrypto.lib;libboost_date_time-vc142-mt-gd-x32-1_75.lib;libzstd.lib;Crypt32.lib;Netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
@@ -109,6 +110,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;..\..\client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;NO_OPENSSL;__STDC_LIMIT_MACROS;HAVE_STRUCT_TIMESPEC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,6 +144,147 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\client\base\audio\audio_capturer.cc" />
+    <ClCompile Include="..\..\client\base\audio\audio_silence_detector.cc" />
+    <ClCompile Include="..\..\client\base\audio\audio_volume_filter.cc" />
+    <ClCompile Include="..\..\client\base\codec\cursor_decoder.cc" />
+    <ClCompile Include="..\..\client\base\codec\scoped_zstd_stream.cc" />
+    <ClCompile Include="..\..\client\base\command_line.cc" />
+    <ClCompile Include="..\..\client\base\cpuid_util.cc" />
+    <ClCompile Include="..\..\client\base\crypto\big_num.cc" />
+    <ClCompile Include="..\..\client\base\crypto\data_cryptor_chacha20_poly1305.cc" />
+    <ClCompile Include="..\..\client\base\crypto\data_cryptor_fake.cc" />
+    <ClCompile Include="..\..\client\base\crypto\generic_hash.cc" />
+    <ClCompile Include="..\..\client\base\crypto\key_pair.cc" />
+    <ClCompile Include="..\..\client\base\crypto\large_number_increment.cc" />
+    <ClCompile Include="..\..\client\base\crypto\message_decryptor_fake.cc" />
+    <ClCompile Include="..\..\client\base\crypto\message_decryptor_openssl.cc" />
+    <ClCompile Include="..\..\client\base\crypto\message_encryptor_fake.cc" />
+    <ClCompile Include="..\..\client\base\crypto\message_encryptor_openssl.cc" />
+    <ClCompile Include="..\..\client\base\crypto\openssl_util.cc" />
+    <ClCompile Include="..\..\client\base\crypto\os_crypt_win.cc" />
+    <ClCompile Include="..\..\client\base\crypto\password_generator.cc" />
+    <ClCompile Include="..\..\client\base\crypto\password_hash.cc" />
+    <ClCompile Include="..\..\client\base\crypto\random.cc" />
+    <ClCompile Include="..\..\client\base\crypto\scoped_crypto_initializer.cc" />
+    <ClCompile Include="..\..\client\base\crypto\secure_memory.cc" />
+    <ClCompile Include="..\..\client\base\crypto\srp_constants.cc" />
+    <ClCompile Include="..\..\client\base\crypto\srp_math.cc" />
+    <ClCompile Include="..\..\client\base\debug.cc" />
+    <ClCompile Include="..\..\client\base\desktop\mouse_cursor.cc" />
+    <ClCompile Include="..\..\client\base\endian_util.cc" />
+    <ClCompile Include="..\..\client\base\files\base_paths.cc" />
+    <ClCompile Include="..\..\client\base\files\file_path_watcher.cc" />
+    <ClCompile Include="..\..\client\base\files\file_util.cc" />
+    <ClCompile Include="..\..\client\base\files\scoped_temp_file.cc" />
+    <ClCompile Include="..\..\client\base\ipc\shared_memory.cc" />
+    <ClCompile Include="..\..\client\base\ipc\shared_memory_factory.cc" />
+    <ClCompile Include="..\..\client\base\ipc\shared_memory_factory_proxy.cc" />
+    <ClCompile Include="..\..\client\base\location.cc" />
+    <ClCompile Include="..\..\client\base\logging.cc" />
+    <ClCompile Include="..\..\client\base\memory\aligned_memory.cc" />
+    <ClCompile Include="..\..\client\base\memory\byte_array.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\message_loop.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\message_loop_task_runner.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_asio.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_default.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\message_pump_win.cc" />
+    <ClCompile Include="..\..\client\base\message_loop\pending_task.cc" />
+    <ClCompile Include="..\..\client\base\net\address.cc" />
+    <ClCompile Include="..\..\client\base\net\ip_util.cc" />
+    <ClCompile Include="..\..\client\base\net\network_channel.cc" />
+    <ClCompile Include="..\..\client\base\net\network_channel_proxy.cc" />
+    <ClCompile Include="..\..\client\base\net\network_server.cc" />
+    <ClCompile Include="..\..\client\base\net\tcp_keep_alive.cc" />
+    <ClCompile Include="..\..\client\base\net\variable_size.cc" />
+    <ClCompile Include="..\..\client\base\peer\authenticator.cc" />
+    <ClCompile Include="..\..\client\base\peer\client_authenticator.cc" />
+    <ClCompile Include="..\..\client\base\peer\host_id.cc" />
+    <ClCompile Include="..\..\client\base\peer\relay_peer.cc" />
+    <ClCompile Include="..\..\client\base\peer\relay_peer_manager.cc" />
+    <ClCompile Include="..\..\client\base\peer\user.cc" />
+    <ClCompile Include="..\..\client\base\peer\user_list.cc" />
+    <ClCompile Include="..\..\client\base\scoped_clear_last_error.cc" />
+    <ClCompile Include="..\..\client\base\settings\json_settings.cc" />
+    <ClCompile Include="..\..\client\base\settings\settings.cc" />
+    <ClCompile Include="..\..\client\base\settings\xml_settings.cc" />
+    <ClCompile Include="..\..\client\base\strings\strcat.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_number_conversions.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_printf.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_split.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_util.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_util_constants.cc" />
+    <ClCompile Include="..\..\client\base\strings\string_util_win.cc" />
+    <ClCompile Include="..\..\client\base\strings\unicode.cc" />
+    <ClCompile Include="..\..\client\base\system_error.cc" />
+    <ClCompile Include="..\..\client\base\system_time.cc" />
+    <ClCompile Include="..\..\client\base\sys_info.cc" />
+    <ClCompile Include="..\..\client\base\sys_info_win.cc" />
+    <ClCompile Include="..\..\client\base\task_runner.cc" />
+    <ClCompile Include="..\..\client\base\threading\simple_thread.cc" />
+    <ClCompile Include="..\..\client\base\threading\thread.cc" />
+    <ClCompile Include="..\..\client\base\threading\thread_checker.cc" />
+    <ClCompile Include="..\..\client\base\version.cc" />
+    <ClCompile Include="..\..\client\base\waitable_timer.cc" />
+    <ClCompile Include="..\..\client\base\win\desktop.cc" />
+    <ClCompile Include="..\..\client\base\win\drive_enumerator.cc" />
+    <ClCompile Include="..\..\client\base\win\file_version_info.cc" />
+    <ClCompile Include="..\..\client\base\win\message_window.cc" />
+    <ClCompile Include="..\..\client\base\win\object_watcher.cc" />
+    <ClCompile Include="..\..\client\base\win\printer_enumerator.cc" />
+    <ClCompile Include="..\..\client\base\win\process_util.cc" />
+    <ClCompile Include="..\..\client\base\win\registry.cc" />
+    <ClCompile Include="..\..\client\base\win\resource_util.cc" />
+    <ClCompile Include="..\..\client\base\win\scoped_clipboard.cc" />
+    <ClCompile Include="..\..\client\base\win\scoped_com_initializer.cc" />
+    <ClCompile Include="..\..\client\base\win\scoped_impersonator.cc" />
+    <ClCompile Include="..\..\client\base\win\scoped_thread_desktop.cc" />
+    <ClCompile Include="..\..\client\base\win\security_helpers.cc" />
+    <ClCompile Include="..\..\client\base\win\service.cc" />
+    <ClCompile Include="..\..\client\base\win\service_controller.cc" />
+    <ClCompile Include="..\..\client\base\win\session_enumerator.cc" />
+    <ClCompile Include="..\..\client\base\win\session_info.cc" />
+    <ClCompile Include="..\..\client\base\win\session_status.cc" />
+    <ClCompile Include="..\..\client\base\win\session_watcher.cc" />
+    <ClCompile Include="..\..\client\base\win\windows_version.cc" />
+    <ClCompile Include="..\..\client\base\xml_sax_writer.cc" />
+    <ClCompile Include="..\..\client\client\client.cc" />
+    <ClCompile Include="..\..\client\client\client_config.cc" />
+    <ClCompile Include="..\..\client\client\client_desktop.cc" />
+    <ClCompile Include="..\..\client\client\client_file_transfer.cc" />
+    <ClCompile Include="..\..\client\client\client_proxy.cc" />
+    <ClCompile Include="..\..\client\client\config_factory.cc" />
+    <ClCompile Include="..\..\client\client\desktop_control_proxy.cc" />
+    <ClCompile Include="..\..\client\client\desktop_window_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_control_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_manager_window_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_remover.cc" />
+    <ClCompile Include="..\..\client\client\file_remover_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_remove_queue_builder.cc" />
+    <ClCompile Include="..\..\client\client\file_remove_window_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_transfer.cc" />
+    <ClCompile Include="..\..\client\client\file_transfer_proxy.cc" />
+    <ClCompile Include="..\..\client\client\file_transfer_queue_builder.cc" />
+    <ClCompile Include="..\..\client\client\file_transfer_window_proxy.cc" />
+    <ClCompile Include="..\..\client\client\input_event_filter.cc" />
+    <ClCompile Include="..\..\client\client\router.cc" />
+    <ClCompile Include="..\..\client\client\router_config.cc" />
+    <ClCompile Include="..\..\client\client\router_config_storage.cc" />
+    <ClCompile Include="..\..\client\client\router_controller.cc" />
+    <ClCompile Include="..\..\client\client\router_proxy.cc" />
+    <ClCompile Include="..\..\client\client\router_window_proxy.cc" />
+    <ClCompile Include="..\..\client\client\status_window_proxy.cc" />
+    <ClCompile Include="..\..\client\common\clipboard.cc" />
+    <ClCompile Include="..\..\client\common\clipboard_monitor.cc" />
+    <ClCompile Include="..\..\client\common\desktop_session_constants.cc" />
+    <ClCompile Include="..\..\client\common\file_depacketizer.cc" />
+    <ClCompile Include="..\..\client\common\file_enumerator_win.cc" />
+    <ClCompile Include="..\..\client\common\file_packetizer.cc" />
+    <ClCompile Include="..\..\client\common\file_task.cc" />
+    <ClCompile Include="..\..\client\common\file_task_consumer_proxy.cc" />
+    <ClCompile Include="..\..\client\common\file_task_factory.cc" />
+    <ClCompile Include="..\..\client\common\file_task_producer_proxy.cc" />
+    <ClCompile Include="..\..\client\common\file_worker.cc" />
     <ClCompile Include="..\..\client\common\pdqhamming.cpp" />
     <ClCompile Include="..\..\client\common\pdqhashtypes.cpp" />
     <ClCompile Include="..\..\client\ctrl-sdl.cpp" />
@@ -153,11 +296,191 @@
     <ClCompile Include="..\..\client\io\pdqio.cpp" />
     <ClCompile Include="..\..\client\minih264.cpp" />
     <ClCompile Include="..\..\client\minivp8.cpp" />
+    <ClCompile Include="..\..\client\proto\common.pb.cc" />
+    <ClCompile Include="..\..\client\proto\desktop.pb.cc" />
+    <ClCompile Include="..\..\client\proto\desktop_extensions.pb.cc" />
+    <ClCompile Include="..\..\client\proto\desktop_internal.pb.cc" />
+    <ClCompile Include="..\..\client\proto\file_transfer.pb.cc" />
+    <ClCompile Include="..\..\client\proto\key_exchange.pb.cc" />
+    <ClCompile Include="..\..\client\proto\relay_peer.pb.cc" />
+    <ClCompile Include="..\..\client\proto\router_admin.pb.cc" />
+    <ClCompile Include="..\..\client\proto\router_common.pb.cc" />
+    <ClCompile Include="..\..\client\proto\router_peer.pb.cc" />
+    <ClCompile Include="..\..\client\proto\system_info.pb.cc" />
     <ClCompile Include="..\..\client\qosreport.cpp" />
     <ClCompile Include="..\..\client\rtspclient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\client\base\audio\audio_capturer.h" />
+    <ClInclude Include="..\..\client\base\audio\audio_silence_detector.h" />
+    <ClInclude Include="..\..\client\base\audio\audio_volume_filter.h" />
+    <ClInclude Include="..\..\client\base\codec\cursor_decoder.h" />
+    <ClInclude Include="..\..\client\base\codec\scoped_zstd_stream.h" />
+    <ClInclude Include="..\..\client\base\command_line.h" />
+    <ClInclude Include="..\..\client\base\cpuid_util.h" />
+    <ClInclude Include="..\..\client\base\crypto\big_num.h" />
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor.h" />
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor_chacha20_poly1305.h" />
+    <ClInclude Include="..\..\client\base\crypto\data_cryptor_fake.h" />
+    <ClInclude Include="..\..\client\base\crypto\generic_hash.h" />
+    <ClInclude Include="..\..\client\base\crypto\key_pair.h" />
+    <ClInclude Include="..\..\client\base\crypto\large_number_increment.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor_fake.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_decryptor_openssl.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor_fake.h" />
+    <ClInclude Include="..\..\client\base\crypto\message_encryptor_openssl.h" />
+    <ClInclude Include="..\..\client\base\crypto\openssl_util.h" />
+    <ClInclude Include="..\..\client\base\crypto\os_crypt.h" />
+    <ClInclude Include="..\..\client\base\crypto\password_generator.h" />
+    <ClInclude Include="..\..\client\base\crypto\password_hash.h" />
+    <ClInclude Include="..\..\client\base\crypto\random.h" />
+    <ClInclude Include="..\..\client\base\crypto\scoped_crypto_initializer.h" />
+    <ClInclude Include="..\..\client\base\crypto\secure_memory.h" />
+    <ClInclude Include="..\..\client\base\crypto\srp_constants.h" />
+    <ClInclude Include="..\..\client\base\crypto\srp_math.h" />
+    <ClInclude Include="..\..\client\base\debug.h" />
+    <ClInclude Include="..\..\client\base\desktop\mouse_cursor.h" />
+    <ClInclude Include="..\..\client\base\endian_util.h" />
+    <ClInclude Include="..\..\client\base\files\base_paths.h" />
+    <ClInclude Include="..\..\client\base\files\file_path_watcher.h" />
+    <ClInclude Include="..\..\client\base\files\file_util.h" />
+    <ClInclude Include="..\..\client\base\files\scoped_temp_file.h" />
+    <ClInclude Include="..\..\client\base\ipc\shared_memory.h" />
+    <ClInclude Include="..\..\client\base\ipc\shared_memory_factory.h" />
+    <ClInclude Include="..\..\client\base\ipc\shared_memory_factory_proxy.h" />
+    <ClInclude Include="..\..\client\base\location.h" />
+    <ClInclude Include="..\..\client\base\logging.h" />
+    <ClInclude Include="..\..\client\base\memory\aligned_memory.h" />
+    <ClInclude Include="..\..\client\base\memory\byte_array.h" />
+    <ClInclude Include="..\..\client\base\memory\typed_buffer.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_loop.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_loop_task_runner.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_pump.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_asio.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_default.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_dispatcher.h" />
+    <ClInclude Include="..\..\client\base\message_loop\message_pump_win.h" />
+    <ClInclude Include="..\..\client\base\message_loop\pending_task.h" />
+    <ClInclude Include="..\..\client\base\net\address.h" />
+    <ClInclude Include="..\..\client\base\net\ip_util.h" />
+    <ClInclude Include="..\..\client\base\net\network_channel.h" />
+    <ClInclude Include="..\..\client\base\net\network_channel_proxy.h" />
+    <ClInclude Include="..\..\client\base\net\network_server.h" />
+    <ClInclude Include="..\..\client\base\net\tcp_keep_alive.h" />
+    <ClInclude Include="..\..\client\base\net\variable_size.h" />
+    <ClInclude Include="..\..\client\base\net\write_task.h" />
+    <ClInclude Include="..\..\client\base\peer\authenticator.h" />
+    <ClInclude Include="..\..\client\base\peer\client_authenticator.h" />
+    <ClInclude Include="..\..\client\base\peer\host_id.h" />
+    <ClInclude Include="..\..\client\base\peer\relay_peer.h" />
+    <ClInclude Include="..\..\client\base\peer\relay_peer_manager.h" />
+    <ClInclude Include="..\..\client\base\peer\user.h" />
+    <ClInclude Include="..\..\client\base\peer\user_list.h" />
+    <ClInclude Include="..\..\client\base\peer\user_list_base.h" />
+    <ClInclude Include="..\..\client\base\scoped_clear_last_error.h" />
+    <ClInclude Include="..\..\client\base\settings\json_settings.h" />
+    <ClInclude Include="..\..\client\base\settings\settings.h" />
+    <ClInclude Include="..\..\client\base\settings\xml_settings.h" />
+    <ClInclude Include="..\..\client\base\strings\strcat.h" />
+    <ClInclude Include="..\..\client\base\strings\string_number_conversions.h" />
+    <ClInclude Include="..\..\client\base\strings\string_printf.h" />
+    <ClInclude Include="..\..\client\base\strings\string_split.h" />
+    <ClInclude Include="..\..\client\base\strings\string_util.h" />
+    <ClInclude Include="..\..\client\base\strings\string_util_constants.h" />
+    <ClInclude Include="..\..\client\base\strings\unicode.h" />
+    <ClInclude Include="..\..\client\base\system_error.h" />
+    <ClInclude Include="..\..\client\base\system_time.h" />
+    <ClInclude Include="..\..\client\base\sys_info.h" />
+    <ClInclude Include="..\..\client\base\task_runner.h" />
+    <ClInclude Include="..\..\client\base\threading\simple_thread.h" />
+    <ClInclude Include="..\..\client\base\threading\thread.h" />
+    <ClInclude Include="..\..\client\base\threading\thread_checker.h" />
+    <ClInclude Include="..\..\client\base\version.h" />
+    <ClInclude Include="..\..\client\base\waitable_timer.h" />
+    <ClInclude Include="..\..\client\base\win\desktop.h" />
+    <ClInclude Include="..\..\client\base\win\drive_enumerator.h" />
+    <ClInclude Include="..\..\client\base\win\file_version_info.h" />
+    <ClInclude Include="..\..\client\base\win\message_window.h" />
+    <ClInclude Include="..\..\client\base\win\object_watcher.h" />
+    <ClInclude Include="..\..\client\base\win\printer_enumerator.h" />
+    <ClInclude Include="..\..\client\base\win\process_util.h" />
+    <ClInclude Include="..\..\client\base\win\registry.h" />
+    <ClInclude Include="..\..\client\base\win\resource_util.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_clipboard.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_com_initializer.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_co_mem.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_gdi_object.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_hdc.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_hglobal.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_impersonator.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_local.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_object.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_select_object.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_thread_desktop.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_user_object.h" />
+    <ClInclude Include="..\..\client\base\win\scoped_wts_memory.h" />
+    <ClInclude Include="..\..\client\base\win\security_helpers.h" />
+    <ClInclude Include="..\..\client\base\win\service.h" />
+    <ClInclude Include="..\..\client\base\win\service_controller.h" />
+    <ClInclude Include="..\..\client\base\win\session_enumerator.h" />
+    <ClInclude Include="..\..\client\base\win\session_info.h" />
+    <ClInclude Include="..\..\client\base\win\session_status.h" />
+    <ClInclude Include="..\..\client\base\win\session_watcher.h" />
+    <ClInclude Include="..\..\client\base\win\windows_version.h" />
+    <ClInclude Include="..\..\client\base\xml_sax_writer.h" />
     <ClInclude Include="..\..\client\CImg.h" />
+    <ClInclude Include="..\..\client\client\client.h" />
+    <ClInclude Include="..\..\client\client\client_config.h" />
+    <ClInclude Include="..\..\client\client\client_desktop.h" />
+    <ClInclude Include="..\..\client\client\client_file_transfer.h" />
+    <ClInclude Include="..\..\client\client\client_proxy.h" />
+    <ClInclude Include="..\..\client\client\config_factory.h" />
+    <ClInclude Include="..\..\client\client\desktop_control.h" />
+    <ClInclude Include="..\..\client\client\desktop_control_proxy.h" />
+    <ClInclude Include="..\..\client\client\desktop_window.h" />
+    <ClInclude Include="..\..\client\client\desktop_window_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_control.h" />
+    <ClInclude Include="..\..\client\client\file_control_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_manager_window.h" />
+    <ClInclude Include="..\..\client\client\file_manager_window_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_remover.h" />
+    <ClInclude Include="..\..\client\client\file_remover_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_remove_queue_builder.h" />
+    <ClInclude Include="..\..\client\client\file_remove_window.h" />
+    <ClInclude Include="..\..\client\client\file_remove_window_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_transfer.h" />
+    <ClInclude Include="..\..\client\client\file_transfer_proxy.h" />
+    <ClInclude Include="..\..\client\client\file_transfer_queue_builder.h" />
+    <ClInclude Include="..\..\client\client\file_transfer_window.h" />
+    <ClInclude Include="..\..\client\client\file_transfer_window_proxy.h" />
+    <ClInclude Include="..\..\client\client\frame_factory.h" />
+    <ClInclude Include="..\..\client\client\input_event_filter.h" />
+    <ClInclude Include="..\..\client\client\router.h" />
+    <ClInclude Include="..\..\client\client\router_config.h" />
+    <ClInclude Include="..\..\client\client\router_config_storage.h" />
+    <ClInclude Include="..\..\client\client\router_controller.h" />
+    <ClInclude Include="..\..\client\client\router_proxy.h" />
+    <ClInclude Include="..\..\client\client\router_window.h" />
+    <ClInclude Include="..\..\client\client\router_window_proxy.h" />
+    <ClInclude Include="..\..\client\client\status_window.h" />
+    <ClInclude Include="..\..\client\client\status_window_proxy.h" />
+    <ClInclude Include="..\..\client\common\clipboard.h" />
+    <ClInclude Include="..\..\client\common\clipboard_monitor.h" />
+    <ClInclude Include="..\..\client\common\desktop_session_constants.h" />
+    <ClInclude Include="..\..\client\common\file_depacketizer.h" />
+    <ClInclude Include="..\..\client\common\file_enumerator.h" />
+    <ClInclude Include="..\..\client\common\file_packet.h" />
+    <ClInclude Include="..\..\client\common\file_packetizer.h" />
+    <ClInclude Include="..\..\client\common\file_platform_util.h" />
+    <ClInclude Include="..\..\client\common\file_task.h" />
+    <ClInclude Include="..\..\client\common\file_task_consumer.h" />
+    <ClInclude Include="..\..\client\common\file_task_consumer_proxy.h" />
+    <ClInclude Include="..\..\client\common\file_task_factory.h" />
+    <ClInclude Include="..\..\client\common\file_task_producer.h" />
+    <ClInclude Include="..\..\client\common\file_task_producer_proxy.h" />
+    <ClInclude Include="..\..\client\common\file_worker.h" />
     <ClInclude Include="..\..\client\common\pdqbasetypes.h" />
     <ClInclude Include="..\..\client\common\pdqhamming.h" />
     <ClInclude Include="..\..\client\common\pdqhashtypes.h" />
@@ -170,6 +493,17 @@
     <ClInclude Include="..\..\client\io\pdqio.h" />
     <ClInclude Include="..\..\client\minih264.h" />
     <ClInclude Include="..\..\client\minivp8.h" />
+    <ClInclude Include="..\..\client\proto\common.pb.h" />
+    <ClInclude Include="..\..\client\proto\desktop.pb.h" />
+    <ClInclude Include="..\..\client\proto\desktop_extensions.pb.h" />
+    <ClInclude Include="..\..\client\proto\desktop_internal.pb.h" />
+    <ClInclude Include="..\..\client\proto\file_transfer.pb.h" />
+    <ClInclude Include="..\..\client\proto\key_exchange.pb.h" />
+    <ClInclude Include="..\..\client\proto\relay_peer.pb.h" />
+    <ClInclude Include="..\..\client\proto\router_admin.pb.h" />
+    <ClInclude Include="..\..\client\proto\router_common.pb.h" />
+    <ClInclude Include="..\..\client\proto\router_peer.pb.h" />
+    <ClInclude Include="..\..\client\proto\system_info.pb.h" />
     <ClInclude Include="..\..\client\qosreport.h" />
     <ClInclude Include="..\..\client\rtspclient.h" />
   </ItemGroup>

@@ -45,3 +45,4 @@ ga/vs2013/Debug/mod/*.dll
 *.exe.recipe
 *.iobj
 *.ipdb
+*.FileListAbsolute.txt

@@ -58,6 +58,7 @@ extern "C" {
 #include <map>
 #include <semaphore.h>
 
+#include "base/threading/thread.h"
 
 using namespace std;
 
@@ -827,8 +828,8 @@ void* thread_start(void* pram) {
 	}
 	return NULL;
 }
-int maintt(int argc, char *argv[]){
-	function();
+int maintt(int argc, char* argv[]) {
+	//function();
 	pthread_t tid1;
 	pthread_t tid2;
 	pthread_t tid3;
@@ -869,6 +870,8 @@ int main(int argc, char *argv[])
 		rtsperror("cannot load configuration file '%s'\n", argv[1]);
 		return -1;
 	}
+	base::Thread io_thread_;
+	io_thread_.start(base::MessageLoop::Type::ASIO);
 #endif
 	// enable logging
 	ga_openlog();
@@ -968,6 +971,7 @@ int main(int argc, char *argv[])
 	}
 	rtspThreadParam.quitLive555 = 1;
 	rtsperror("terminating ...\n");
+	io_thread_.stop();
 #ifndef ANDROID
 	pthread_cancel(rtspthread);
 	if(rtspconf->ctrlenable)
