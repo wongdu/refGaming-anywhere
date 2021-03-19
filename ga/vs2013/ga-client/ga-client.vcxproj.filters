@@ -579,6 +579,12 @@
     <ClCompile Include="..\..\client\client\config_factory.cc">
       <Filter>client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\client\AsyncClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\client\CtrlClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\client\ctrl-sdl.h">
@@ -1165,6 +1171,18 @@
     </ClInclude>
     <ClInclude Include="..\..\client\client\config_factory.h">
       <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\AsyncClient.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\CtrlClient.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\CtrlMessage.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\client\chat_message.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

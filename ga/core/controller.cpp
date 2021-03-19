@@ -243,6 +243,11 @@ void* ctrl_client_thread(void *rtspconf) {
 	}
 
 	ga_error("controller client-thread started: tid=%ld.\n", ga_gettid());
+	if (conf->ctrlproto == IPPROTO_TCP) {
+		BOOL nodelayval = TRUE;
+		if (setsockopt(ctrlsocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&nodelayval, sizeof(BOOL)))
+			throw std::exception();
+	}
 
 	while(true) {
 		struct queuemsg *qm;

@@ -16,8 +16,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <chrono>
 #include <stdarg.h>
 #include <string.h>
+#include <memory>
+#include <codecvt>
 
 #include <pthread.h>
 #include <SDL2/SDL.h>
@@ -44,6 +47,8 @@ extern "C" {
 }
 #endif
 
+#include "CtrlClient.h"
+
 #include "rtspconf.h"
 #include "rtspclient.h"
 
@@ -57,8 +62,13 @@ extern "C" {
 
 #include <map>
 #include <semaphore.h>
+#include <thread>
 
-#include "base/threading/thread.h"
+#include <iostream>
+#include "chat_message.hpp"
+//#include "base/threading/thread.h"
+//#include "AsyncClient.h"
+//#include "CtrlClient.h"
 
 using namespace std;
 
@@ -83,6 +93,8 @@ static int nativeSizeX[VIDEO_SOURCE_CHANNEL_MAX];
 static int nativeSizeY[VIDEO_SOURCE_CHANNEL_MAX];
 static map<unsigned int, int> windowId2ch;
 
+std::unique_ptr<CtrlClient> pCtrlClient;
+
 // save files
 static FILE *savefp_keyts = NULL;
 
@@ -91,6 +103,18 @@ static FILE *savefp_keyts = NULL;
 #define	DEFAULT_FONTSIZE	24
 static TTF_Font *defFont = NULL;
 #endif
+
+//ctrl_client_sendmsg
+static void ctrlClientSendMsg(void* msg, int msglen) {
+	CtrlMessage ctrlMsg;
+	ctrlMsg.body_length(msglen);
+	std::memcpy(ctrlMsg.body(), msg, msglen);
+
+	/*ctrlMsg.body_length(strlen("123456"));
+	std::memcpy(ctrlMsg.body(), "123456", strlen("123456"));*/
+	//c.write(msg);
+	pCtrlClient->write(ctrlMsg);
+}
 
 static void switch_fullscreen() {
 	unsigned int flags;
@@ -400,6 +424,9 @@ void ProcessEvent(SDL_Event *event) {
 	map<unsigned int,int>::iterator mi;
 	int ch;
 	struct timeval tv;
+	static auto start = std::chrono::high_resolution_clock::now();
+	static unsigned long mouseMoveCount = 0;
+	static unsigned int currTime = 0;
 	switch(event->type) {
 	case SDL_KEYUP:
 		if(event->key.keysym.sym == SDLK_BACKQUOTE
@@ -426,7 +453,8 @@ void ProcessEvent(SDL_Event *event) {
 			event->key.keysym.sym,
 			event->key.keysym.mod,
 			0/*event->key.keysym.unicode*/);
-		ctrl_client_sendmsg(&m, sizeof(sdlmsg_keyboard_t));
+		//ctrl_client_sendmsg(&m, sizeof(sdlmsg_keyboard_t));
+		ctrlClientSendMsg(&m, sizeof(sdlmsg_keyboard_t));
 		}
 		if(savefp_keyts != NULL) {
 			gettimeofday(&tv, NULL);
@@ -450,7 +478,8 @@ void ProcessEvent(SDL_Event *event) {
 			event->key.keysym.sym,
 			event->key.keysym.mod,
 			0/*event->key.keysym.unicode*/);
-		ctrl_client_sendmsg(&m, sizeof(sdlmsg_keyboard_t));
+		//ctrl_client_sendmsg(&m, sizeof(sdlmsg_keyboard_t));
+		ctrlClientSendMsg(&m, sizeof(sdlmsg_keyboard_t));
 		}
 		if(savefp_keyts != NULL) {
 			gettimeofday(&tv, NULL);
@@ -468,7 +497,8 @@ void ProcessEvent(SDL_Event *event) {
 			sdlmsg_mousekey(&m, 0, event->button.button,
 				xlat_mouseX(ch, event->button.x),
 				xlat_mouseY(ch, event->button.y));
-			ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			//ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			ctrlClientSendMsg(&m, sizeof(sdlmsg_mouse_t));
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
@@ -478,10 +508,12 @@ void ProcessEvent(SDL_Event *event) {
 			sdlmsg_mousekey(&m, 1, event->button.button,
 				xlat_mouseX(ch, event->button.x),
 				xlat_mouseY(ch, event->button.y));
-			ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			//ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			ctrlClientSendMsg(&m, sizeof(sdlmsg_mouse_t));
 		}
 		break;
 	case SDL_MOUSEMOTION:
+		mouseMoveCount++;
 		mi = windowId2ch.find(event->motion.windowID);
 		if(mi != windowId2ch.end() && rtspconf->ctrlenable && rtspconf->sendmousemotion) {
 			ch = mi->second;
@@ -492,14 +524,24 @@ void ProcessEvent(SDL_Event *event) {
 				xlat_mouseY(ch, event->motion.yrel),
 				event->motion.state,
 				relativeMouseMode == 0 ? 0 : 1);
-			ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			//ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			ctrlClientSendMsg(&m, sizeof(sdlmsg_mouse_t));
+			if (mouseMoveCount >= 60) {
+				auto end = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<double, std::milli> elapsed = end - start;
+				rtsperror("curr time is %d,the mouse move frequently is %f.\n", currTime, 1.0f * 60 / elapsed.count() * 1000);
+				start = std::chrono::high_resolution_clock::now();
+				mouseMoveCount = 0;
+				currTime++;
+			}
 		}
 		break;
 #if 1	// only support SDL2
 	case SDL_MOUSEWHEEL:
 		if(rtspconf->ctrlenable && rtspconf->sendmousemotion) {
 			sdlmsg_mousewheel(&m, event->motion.x, event->motion.y);
-			ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			//ctrl_client_sendmsg(&m, sizeof(sdlmsg_mouse_t));
+			ctrlClientSendMsg(&m, sizeof(sdlmsg_mouse_t));
 		}
 		break;
 #ifdef ANDROID
@@ -848,6 +890,145 @@ int maintt(int argc, char* argv[]) {
 	return 0;
 }
 
+using boost::asio::ip::tcp;
+
+typedef std::deque<chat_message> chat_message_queue;
+
+class chat_client
+{
+public:
+	chat_client(boost::asio::io_context& io_context,
+		const tcp::resolver::results_type& endpoints)
+		: io_context_(io_context),
+		socket_(io_context)
+	{
+		do_connect(endpoints);
+	}
+
+	void write(const chat_message& msg)
+	{
+		boost::asio::post(io_context_,
+			[this, msg]()
+			{
+				bool write_in_progress = !write_msgs_.empty();
+				write_msgs_.push_back(msg);
+				if (!write_in_progress)
+				{
+					do_write();
+				}
+			});
+	}
+
+	void close()
+	{
+		boost::asio::post(io_context_, [this]() { socket_.close(); });
+	}
+
+private:
+	void do_connect(const tcp::resolver::results_type& endpoints)
+	{
+		boost::asio::async_connect(socket_, endpoints,
+			[this](boost::system::error_code ec, tcp::endpoint)
+			{
+				if (!ec)
+				{
+					//do_read_header();
+				}
+			});
+	}
+
+	void do_read_header()
+	{
+		boost::asio::async_read(socket_,
+			boost::asio::buffer(read_msg_.data(), chat_message::header_length),
+			[this](boost::system::error_code ec, std::size_t /*length*/)
+			{
+				if (!ec && read_msg_.decode_header())
+				{
+					do_read_body();
+				}
+				else
+				{
+					socket_.close();
+				}
+			});
+	}
+
+	void do_read_body()
+	{
+		boost::asio::async_read(socket_,
+			boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
+			[this](boost::system::error_code ec, std::size_t /*length*/)
+			{
+				if (!ec)
+				{
+					std::cout.write(read_msg_.body(), read_msg_.body_length());
+					std::cout << "\n";
+					do_read_header();
+				}
+				else
+				{
+					socket_.close();
+				}
+			});
+	}
+
+	void do_write()
+	{
+		boost::asio::async_write(socket_,
+			boost::asio::buffer(write_msgs_.front().data(),
+				write_msgs_.front().length()),
+			[this](boost::system::error_code ec, std::size_t /*length*/)
+			{
+				if (!ec)
+				{
+					write_msgs_.pop_front();
+					if (!write_msgs_.empty())
+					{
+						do_write();
+					}
+				}
+				else
+				{
+					socket_.close();
+				}
+			});
+	}
+
+private:
+	boost::asio::io_context& io_context_;
+	tcp::socket socket_;
+	chat_message read_msg_;
+	chat_message_queue write_msgs_;
+};
+
+int main4(int argc, char* argv[])
+{
+	boost::asio::io_context io_context;
+
+	tcp::resolver resolver(io_context);
+	//auto endpoints = resolver.resolve(argv[1], argv[2]);
+	auto endpoints = resolver.resolve("127.0.0.1", "11110");
+	chat_client c(io_context, endpoints);
+
+	std::thread t([&io_context]() { io_context.run(); });
+
+	char line[chat_message::max_body_length + 1];
+	while (std::cin.getline(line, chat_message::max_body_length + 1))
+	{
+		chat_message msg;
+		msg.body_length(std::strlen(line));
+		std::memcpy(msg.body(), line, msg.body_length());
+		msg.encode_header();
+		c.write(msg);
+	}
+
+	c.close();
+	t.join();
+
+	return 0;
+}
+
 int main(int argc, char *argv[]) 
 {
 	int i;
@@ -866,12 +1047,39 @@ int main(int argc, char *argv[])
 		rtsperror("usage: %s config url\n", argv[0]);
 		return -1;
 	}
+
+	//boost::asio::io_context io_context;
+	
+	boost::asio::io_context io_context;
+
+
+
+	/*char line[chat_message::max_body_length + 1];
+	while (std::cin.getline(line, chat_message::max_body_length + 1))
+	{
+		chat_message msg;
+		msg.body_length(std::strlen(line));
+		std::memcpy(msg.body(), line, msg.body_length());
+		msg.encode_header();
+		c.write(msg);
+	}*/
+
+	/*c.close();
+	t.join();*/
+	
+
 	if(ga_init(argv[1], argv[2]) < 0) {
 		rtsperror("cannot load configuration file '%s'\n", argv[1]);
 		return -1;
 	}
-	base::Thread io_thread_;
-	io_thread_.start(base::MessageLoop::Type::ASIO);
+	
+	//tcp::resolver resolver(io_context);
+	////auto endpoints = resolver.resolve(argv[1], argv[2]);
+	//auto endpoints = resolver.resolve("127.0.0.1", "11110");
+	//chat_client c(io_context, endpoints);
+
+	//std::thread t([&io_context]() { io_context.run(); });
+
 #endif
 	// enable logging
 	ga_openlog();
@@ -927,7 +1135,7 @@ int main(int argc, char *argv[])
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 #endif
 	// launch controller?
-	do if(rtspconf->ctrlenable) {
+	/*do if(rtspconf->ctrlenable) {
 		if(ctrl_queue_init(32768, sizeof(sdlmsg_t)) < 0) {
 			rtsperror("Cannot initialize controller queue, controller disabled.\n");
 			rtspconf->ctrlenable = 0;
@@ -939,7 +1147,45 @@ int main(int argc, char *argv[])
 			break;
 		}
 		pthread_detach(ctrlthread);
-	} while(0);
+	} while(0);*/
+
+	/* base::Thread io_thread_;
+	io_thread_.start(base::MessageLoop::Type::ASIO);
+	//AsyncClient asyncClinet;
+	client::Config config;
+	//config.address_or_id = std::u16string("");
+	config.address_or_id = std::wstring_convert< std::codecvt_utf8_utf16<char16_t>, char16_t >{}.from_bytes(std::string("10.11.0.21"));
+	config.port = 8555;
+	//config.username = parser.value(username_option).toStdU16String();
+	std::shared_ptr<client::AsyncClient> pAsyncClient = std::make_shared<client::AsyncClient>();
+	pAsyncClient->connectToHost(io_thread_.taskRunner(), config);*/
+
+	//tcp::resolver resolver(io_context);
+	////auto endpoints = resolver.resolve(argv[1], argv[2]);
+	////auto endpoints = resolver.resolve("127.0.0.1", "11110");
+	//auto endpoints = resolver.resolve(rtspconf->servername, std::to_string(rtspconf->ctrlport));
+	//chat_client c(io_context, endpoints);
+
+	//std::thread t([&io_context]() { io_context.run(); });
+
+	tcp::resolver resolver(io_context);
+	//auto endpoints = resolver.resolve(std::string("10.11.0.21"), 8555);
+	//auto endpoints = resolver.resolve(std::string("10.11.0.21"), std::string("8555"));
+	//auto endpoints = resolver.resolve(rtspconf->servername, std::to_string(rtspconf->ctrlport+1));
+	auto endpoints = resolver.resolve(rtspconf->servername, std::to_string(rtspconf->ctrlport));
+	pCtrlClient = std::make_unique<CtrlClient>(io_context, endpoints);
+	std::thread t([&io_context]() { io_context.run(); });
+
+	//CtrlClient c(io_context, endpoints);
+	//std::thread t([&io_context]() { 
+	//	//io_context.restart();
+	//	io_context.run(); 
+	//	});
+	//io_context.run();
+
+	//CtrlClient ctrlClient(io_context, endpoints);
+	//pCtrlClient = std::make_unique<CtrlClient>(io_context, endpoints);
+	//std::thread t([&io_context]() { io_context.run(); });
 	// launch watchdog
 	pthread_mutex_init(&watchdogMutex, NULL);
 	if(ga_conf_readbool("enable-watchdog", 1) == 1) {
@@ -964,6 +1210,8 @@ int main(int argc, char *argv[])
 	}
 	pthread_detach(rtspthread);
 	//
+	//pCtrlClient = std::make_unique<CtrlClient>(io_context, endpoints);
+	
 	while(rtspThreadParam.running) {
 		if(SDL_WaitEvent(&event)) {
 			ProcessEvent(&event);
@@ -971,11 +1219,17 @@ int main(int argc, char *argv[])
 	}
 	rtspThreadParam.quitLive555 = 1;
 	rtsperror("terminating ...\n");
-	io_thread_.stop();
+	//io_thread_.stop();
+	//ctrlClient.close();
+	pCtrlClient->close();
+	//t.join();
+
+	//c.close();
+	t.join();
 #ifndef ANDROID
 	pthread_cancel(rtspthread);
-	if(rtspconf->ctrlenable)
-		pthread_cancel(ctrlthread);
+	/*if(rtspconf->ctrlenable)
+		pthread_cancel(ctrlthread);*/
 	pthread_cancel(watchdog);
 #endif
 	//SDL_WaitThread(thread, &status);	
