@@ -415,6 +415,9 @@ tcp_readmore:
 				close(socket);
 				goto restart;
 			}
+			DWORD bytes_returned = 0;
+			int freq = 1;
+			WSAIoctl(socket, SIO_TCP_SET_ACK_FREQUENCY, &freq, sizeof(freq), NULL, 0, &bytes_returned, NULL, NULL);
 #if 0
 			ga_error("controller server-debug: recv msg (%d bytes) | head = %02x %02x\n",
 				rlen, buf[0], buf[1]);
